@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Informasi Keperawatan - Nerstizen</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* =========================================================
+           1. CSS VARIABLES (MEDICAL TEAL THEME)
+        ========================================================= */
+        :root {
+            --primary: #0891b2;        /* Medical Teal - Warna identitas perawat */
+            --primary-light: #cffafe;  /* Background soft teal */
+            --primary-dark: #164e63;   /* Teks gelap teal */
+            
+            --bg-app: #f8fafc;         /* Background utama abu-abu sangat muda */
+            --bg-card: #ffffff;        /* Background kartu putih bersih */
+            
+            --text-dark: #0f172a;      /* Teks judul (Slate 900) */
+            --text-muted: #64748b;     /* Teks deskripsi (Slate 500) */
+            
+            --danger: #e11d48;         /* Merah untuk Early Warning / Kritis */
+            --danger-light: #ffe4e6;
+            
+            --warning: #d97706;        /* Oranye untuk Perhatian */
+            --warning-light: #fef3c7;
+            
+            --success: #10b981;        /* Hijau untuk Normal/Stabil */
+            --success-light: #d1fae5;
+
+            --border: #e2e8f0;         /* Garis batas tipis */
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 10px 20px rgba(15, 23, 42, 0.05);
+            
+            --sidebar-width: 260px;
+            --sidebar-width-collapsed: 80px;
+        }
+
+        /* =========================================================
+           2. GLOBAL RESET
+        ========================================================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        body {
+            background-color: var(--bg-app);
+            color: var(--text-dark);
+            overflow: hidden; /* Mencegah scroll double */
+        }
+
+        /* =========================================================
+           3. LAYOUT GRID
+        ========================================================= */
+        .layout-wrapper {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* =========================================================
+           4. SIDEBAR NAVIGATION
+        ========================================================= */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-card);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        .brand i {
+            font-size: 1.5rem;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 20px 12px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .nav-menu::-webkit-scrollbar { display: none; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item i {
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-item:hover {
+            background-color: #f1f5f9;
+            color: var(--primary);
+            transform: translateX(4px);
+        }
+
+        .nav-item.active {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* Badge untuk Early Warning */
+        .nav-badge {
+            margin-left: auto;
+            background-color: var(--danger);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 800;
+        }
+
+        /* Sidebar Footer (User Info) */
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .user-info h4 { font-size: 0.85rem; color: var(--text-dark); }
+        .user-info p { font-size: 0.75rem; color: var(--text-muted); }
+
+        /* =========================================================
+           5. MAIN CONTENT AREA
+        ========================================================= */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header Atas */
+        .topbar {
+            height: 70px;
+            background-color: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 99;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .menu-toggle {
+            display: none; /* Disembunyikan di PC */
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .page-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .real-time-clock {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Konten Halaman */
+        .page-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* =========================================================
+           6. COMPONENT STYLES (Contoh Dashboard)
+        ========================================================= */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-info h3 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+            line-height: 1;
+        }
+
+        .stat-info p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Varian Warna Card */
+        .card-teal .stat-icon { background: var(--primary-light); color: var(--primary); }
+        .card-red .stat-icon { background: var(--danger-light); color: var(--danger); }
+        .card-green .stat-icon { background: var(--success-light); color: var(--success); }
+        .card-orange .stat-icon { background: var(--warning-light); color: var(--warning); }
+
+        /* Panel Content Area (Untuk menyembunyikan halaman) */
+        .view-panel {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .view-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* =========================================================
+           7. MOBILE RESPONSIVE (Tablet & Smartphone)
+        ========================================================= */
+        @media (max-width: 1024px) {
+            .page-content { padding: 20px; }
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle { display: block; } /* Tampilkan tombol hamburger */
+            
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                top: 0;
+                bottom: 0;
+                box-shadow: var(--shadow-md);
+            }
+
+            .sidebar.mobile-open {
+                left: 0;
+            }
+
+            .real-time-clock { display: none; } /* Sembunyikan jam di HP agar tidak sempit */
+            .topbar { padding: 0 15px; }
+
+            /* Overlay Gelap saat sidebar terbuka di HP */
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(15, 23, 42, 0.4);
+                backdrop-filter: blur(2px);
+                z-index: 999;
+            }
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout-wrapper">
+        
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="brand">
+                    <i class="fa-solid fa-kit-medical"></i>
+                    <span>Nerstizen</span>
+                </a>
+            </div>
+
+            <div class="nav-menu">
+                <div class="nav-item active" onclick="switchMenu(this, 'view-dashboard', 'Dashboard Monitor')">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </div>
+                
+                <div class="nav-item" onclick="switchMenu(this, 'view-pasien', 'Data Pasien')">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Data Pasien</span>
+                </div>
+
+                <div class="nav-item" onclick="switchMenu(this, 'view-askep', 'Asuhan Keperawatan')">
+                    <i class="fa-solid fa-notes-medical"></i>
+                    <span>Asuhan Keperawatan</span>
+                </div>
+
+                <div class="nav-item" onclick="switchMenu(this, 'view-obat', 'Lembar Obat')">
+                    <i class="fa-solid fa-pills"></i>
+                    <span>Lembar Obat</span>
+                </div>
+
+                <div class="nav-item" onclick="switchMenu(this, 'view-pengawasan', 'Pengawasan Khusus')">
+                    <i class="fa-solid fa-eye"></i>
+                    <span>Pengawasan Khusus</span>
+                </div>
+
+                <div class="nav-item" onclick="switchMenu(this, 'view-ews', 'Early Warning System')">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                    <span>Early Warning</span>
+                    <span class="nav-badge">2 Alert</span>
+                </div>
+
+                <div class="nav-item" onclick="switchMenu(this, 'view-admin', 'Administrasi')">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <span>Administrasi</span>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="avatar"><i class="fa-solid fa-user-nurse"></i></div>
+                <div class="user-info">
+                    <h4>Ners. Admin</h4>
+                    <p>Ruang ICU / Pagi</p>
+                </div>
+            </div>
+        </aside>
+
+        <div class="main-wrapper">
+            
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-toggle" onclick="toggleSidebar()">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1 class="page-title" id="pageTitle">Dashboard Monitor</h1>
+                </div>
+                
+                <div class="topbar-right">
+                    <div class="real-time-clock">
+                        <i class="fa-regular fa-clock"></i>
+                        <span id="liveClock">Loading...</span>
+                    </div>
+                </div>
+            </header>
+
+            <main class="page-content">
+                
+                <div id="view-dashboard" class="view-panel active">
+                    <div class="stats-grid">
+                        <div class="stat-card card-teal">
+                            <div class="stat-icon"><i class="fa-solid fa-bed-pulse"></i></div>
+                            <div class="stat-info">
+                                <h3>24</h3>
+                                <p>Total Pasien Rawat</p>
+                            </div>
+                        </div>
+                        <div class="stat-card card-red">
+                            <div class="stat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <div class="stat-info">
+                                <h3>2</h3>
+                                <p>EWS Kritis (Skor > 5)</p>
+                            </div>
+                        </div>
+                        <div class="stat-card card-orange">
+                            <div class="stat-icon"><i class="fa-solid fa-bell"></i></div>
+                            <div class="stat-info">
+                                <h3>5</h3>
+                                <p>Jadwal Obat Tertunda</p>
+                            </div>
+                        </div>
+                        <div class="stat-card card-green">
+                            <div class="stat-icon"><i class="fa-solid fa-clipboard-check"></i></div>
+                            <div class="stat-info">
+                                <h3>18</h3>
+                                <p>Askep Selesai Shift Ini</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: white; padding: 30px; border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); text-align: center; color: var(--text-muted);">
+                        <i class="fa-solid fa-chart-area fa-3x" style="color: #cbd5e1; margin-bottom: 15px;"></i>
+                        <h3>Area Grafik & Monitoring</h3>
+                        <p>Silakan integrasikan Chart.js atau tabel data pasien di area ini.</p>
+                    </div>
+                </div>
+
+                <div id="view-pasien" class="view-panel">
+                    <div style="background: white; padding: 40px; border-radius: 20px; text-align: center; border: 1px dashed var(--border);">
+                        <i class="fa-solid fa-users fa-3x" style="color: var(--primary); margin-bottom: 15px;"></i>
+                        <h2>Modul Data Pasien</h2>
+                        <p style="color: var(--text-muted); margin-top: 10px;">Halaman pencarian, penerimaan, dan mutasi pasien akan muncul di sini.</p>
+                    </div>
+                </div>
+
+                <div id="view-askep" class="view-panel">
+                    <div style="background: white; padding: 40px; border-radius: 20px; text-align: center; border: 1px dashed var(--border);">
+                        <i class="fa-solid fa-notes-medical fa-3x" style="color: var(--primary); margin-bottom: 15px;"></i>
+                        <h2>Modul Asuhan Keperawatan</h2>
+                        <p style="color: var(--text-muted); margin-top: 10px;">Form pengkajian, diagnosa (SDKI), intervensi (SIKI), dan implementasi.</p>
+                    </div>
+                </div>
+
+                <div id="view-obat" class="view-panel">
+                    <div style="background: white; padding: 40px; border-radius: 20px; text-align: center; border: 1px dashed var(--border);">
+                        <i class="fa-solid fa-pills fa-3x" style="color: var(--primary); margin-bottom: 15px;"></i>
+                        <h2>Modul Lembar Obat</h2>
+                        <p style="color: var(--text-muted); margin-top: 10px;">Jadwal pemberian terapi intravena, oral, dan cairan pasien.</p>
+                    </div>
+                </div>
+
+                <div id="view-pengawasan" class="view-panel">
+                    <div style="background: white; padding: 40px; border-radius: 20px; text-align: center; border: 1px dashed var(--border);">
+                        <i class="fa-solid fa-eye fa-3x" style="color: var(--primary); margin-bottom: 15px;"></i>
+                        <h2>Modul Pengawasan Khusus</h2>
+                        <p style="color: var(--text-muted); margin-top: 10px;">Monitoring cairan (I/O), pengawasan ventilator, dan alat medis lainnya.</p>
+                    </div>
+                </div>
+
+                <div id="view-ews" class="view-panel">
+                    <div style="background: white; padding: 40px; border-radius: 20px; text-align: center; border: 1px dashed var(--border);">
+                        <i class="fa-solid fa-heart-pulse fa-3x" style="color: var(--danger); margin-bottom: 15px;"></i>
+                        <h2>Modul Early Warning System (EWS)</h2>
+                        <p style="color: var(--text-muted); margin-top: 10px;">Form EWS (PEWS, NEWS, MEWS) yang Anda buat sebelumnya dapat dipindahkan ke dalam kontainer ini.</p>
+                    </div>
+                </div>
+
+                <div id="view-admin" class="view-panel">
+                    <div style="background: white; padding: 40px; border-radius: 20px; text-align: center; border: 1px dashed var(--border);">
+                        <i class="fa-solid fa-folder-open fa-3x" style="color: var(--primary); margin-bottom: 15px;"></i>
+                        <h2>Modul Administrasi</h2>
+                        <p style="color: var(--text-muted); margin-top: 10px;">Billing, cetak resume pulang, dan pencatatan inventaris ruangan.</p>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. FUNGSI JAM REAL-TIME ---
+        function updateClock() {
+            const now = new Date();
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            document.getElementById('liveClock').innerText = now.toLocaleDateString('id-ID', options).replace(/\./g, ':');
+        }
+        setInterval(updateClock, 1000);
+        updateClock(); // Panggil segera saat load
+
+        // --- 2. FUNGSI TOGGLE SIDEBAR (MOBILE) ---
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('active');
+        }
+
+        // --- 3. FUNGSI SWITCH MENU SPA (SINGLE PAGE APPLICATION) ---
+        function switchMenu(element, targetViewId, pageTitle) {
+            // A. Update Visual Menu Active di Sidebar
+            const allItems = document.querySelectorAll('.nav-item');
+            allItems.forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+
+            // B. Update Judul Halaman di Topbar
+            document.getElementById('pageTitle').innerText = pageTitle;
+
+            // C. Ganti Konten (Sembunyikan semua, munculkan target)
+            const allViews = document.querySelectorAll('.view-panel');
+            allViews.forEach(view => view.classList.remove('active'));
+            document.getElementById(targetViewId).classList.add('active');
+
+            // D. Tutup sidebar otomatis jika diakses lewat HP
+            if(window.innerWidth <= 768) {
+                toggleSidebar();
+            }
+        }
+    </script>
+</body>
+</html>

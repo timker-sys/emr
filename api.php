@@ -72,7 +72,7 @@ switch ($action) {
             // Ambil semua data pasien TERMASUK JK dan JAM_KES
             $stmt = $conn->prepare("
                 SELECT no_mr, nama_pasien, jk, jam_kes, diagnosa, tgl_lahir, 
-                DATE_FORMAT(tgl_lahir, '%d/%m/%Y') as tgl_lahir_indo,
+                IFNULL(DATE_FORMAT(tgl_lahir, '%d/%m/%Y'), '-') as tgl_lahir_indo,
                 IFNULL(created_at, 'Belum ada') as created_at
                 FROM pasien 
                 ORDER BY created_at DESC 
@@ -80,9 +80,15 @@ switch ($action) {
             $stmt->execute();
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
-            echo json_encode($result);
+            // CEK JIKA RESULT KOSONG (Table ada tapi belum ada data)
+            if (!$result) {
+                 echo json_encode([]); 
+            } else {
+                 echo json_encode($result);
+            }
         } catch (Exception $e) {
-            echo json_encode(["error" => $e->getMessage()]);
+            // JANGAN HANYA 'error', samakan format JSON dengan frontend
+            echo json_encode(["success" => false, "error" => "Database Error: " . $e->getMessage()]);
         }
         break;
 

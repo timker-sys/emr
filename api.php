@@ -10,18 +10,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit();
 }
 
-// --- PENDETEKSI OTOMATIS CONFIG PASSWORD ---
-// Cek apakah config ada di folder yang sama (EMR/)
-if (file_exists(__DIR__ . '/config.local2.php')) {
-    require_once __DIR__ . '/config.local2.php';
-} 
-// Jika tidak ada, cari di 1 tingkat ke atas (public_html/)
-else if (file_exists(__DIR__ . '/../config.local2.php')) {
-    require_once __DIR__ . '/../config.local2.php';
-} 
-// Jika tidak ada juga, hentikan sistem untuk keamanan
-else {
-    echo json_encode(["success" => false, "message" => "File konfigurasi database tidak ditemukan!"]);
+// --- DIAGNOSA JALUR CONFIG ---
+$path1 = __DIR__ . '/config.local2.php';
+$path2 = __DIR__ . '/../config.local2.php';
+
+if (file_exists($path1)) {
+    require_once $path1;
+} else if (file_exists($path2)) {
+    require_once $path2;
+} else {
+    echo json_encode([
+        "success" => false, 
+        "message" => "File tidak ditemukan!",
+        "debug_info" => [
+            "sedang_mencari_di_1" => $path1,
+            "sedang_mencari_di_2" => $path2
+        ]
+    ]);
     exit();
 }
 

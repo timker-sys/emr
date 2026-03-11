@@ -1,106 +1,136 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Informasi Perawat - Nerstizen</title>
+    <title>Nerstizen - Sistem Keperawatan Modern</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         /* =========================================================
-           1. CSS VARIABLES (LIGHT MODE DEFAULT)
+           1. CSS VARIABLES (LIGHT & DARK THEME)
         ========================================================= */
         :root {
-            --maroon-dark: #4c0519;    
-            --maroon-main: #831843;    
-            --maroon-light: #9f1239;   
-            --maroon-soft: #fce7f3;    
+            /* Tema Terang (Light Mode) */
+            --bg-main: #f4f7f9;        /* Warna latar belakang terluar (opsional) */
+            --bg-surface: #ffffff;     /* Warna Sidebar, Header, Container (Putih menyatu) */
+            --bg-hover: #f1f5f9;       /* Efek hover menu */
             
-            --bg-body: #f1f5f9;
-            --bg-card: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
             
-            --text-dark: #0f172a;
-            --text-muted: #64748b;
+            --accent: #0ea5e9;         /* Nurse Blue / Sky Blue */
+            --accent-hover: #0284c7;
+            --accent-light: #e0f2fe;
             
-            --border: #e2e8f0;
-            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --danger: #ef4444;
+            --success: #10b981;
             
-            --sidebar-width: 280px;
+            --shadow-dropdown: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.03);
+            
+            --sidebar-width: 260px;
+        }
+
+        /* Tema Gelap (Dark Mode) */
+        [data-theme="dark"] {
+            --bg-main: #0f172a;        /* Latar belakang terluar gelap */
+            --bg-surface: #1e293b;     /* Sidebar, Header, Container gelap menyatu */
+            --bg-hover: #334155;
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            
+            --accent: #38bdf8;
+            --accent-hover: #7dd3fc;
+            --accent-light: rgba(56, 189, 248, 0.15);
+            
+            --shadow-dropdown: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
 
         /* =========================================================
-           1.B CSS VARIABLES (DARK MODE)
+           2. GLOBAL RESET & BASE
         ========================================================= */
-        body.dark-mode {
-            --bg-body: #0f172a;        /* Background utama gelap (Slate 900) */
-            --bg-card: #1e293b;        /* Background kartu gelap (Slate 800) */
-            
-            --text-dark: #f8fafc;      /* Teks utama menjadi putih/terang */
-            --text-muted: #94a3b8;     /* Teks sekunder abu-abu terang */
-            
-            --border: #334155;         /* Garis batas menjadi lebih gelap */
-            
-            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-            --maroon-soft: #4c0519;    /* Hover state di dropdown disesuaikan */
-        }
-
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
         body {
-            background-color: var(--bg-body);
-            color: var(--text-dark);
-            overflow: hidden; 
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            overflow: hidden; /* Mencegah scroll double */
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* =========================================================
+           3. LAYOUT & SIDEBAR
+        ========================================================= */
+        .app-layout {
             display: flex;
             height: 100vh;
             width: 100vw;
-            transition: background-color 0.4s ease, color 0.4s ease;
         }
 
-        /* =========================================================
-           2. SIDEBAR (MAROON THEME)
-        ========================================================= */
+        /* Sidebar menyatu dengan warna container */
         .sidebar {
             width: var(--sidebar-width);
-            background: linear-gradient(180deg, var(--maroon-main) 0%, var(--maroon-dark) 100%);
-            color: white;
+            background-color: var(--bg-surface);
             display: flex;
             flex-direction: column;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1000;
-            box-shadow: 4px 0 24px rgba(0,0,0,0.1);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.02);
         }
 
-        .sidebar-brand {
+        /* Hamburger di kiri Logo */
+        .sidebar-header {
             height: 80px;
             display: flex;
             align-items: center;
-            padding: 0 25px;
-            font-size: 1.4rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            gap: 12px;
+            padding: 0 20px;
+            gap: 15px;
         }
 
-        .sidebar-brand i { color: #fda4af; }
+        .btn-hamburger {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+        }
+        .btn-hamburger:hover { background-color: var(--bg-hover); color: var(--accent); }
 
-        .nav-menu {
+        .brand-logo {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+        }
+        .brand-logo i { color: var(--accent); }
+
+        .sidebar-nav {
             flex: 1;
-            padding: 20px 15px;
+            padding: 10px 15px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 4px;
         }
-        .nav-menu::-webkit-scrollbar { display: none; }
+        .sidebar-nav::-webkit-scrollbar { display: none; }
 
         .nav-item {
             display: flex;
@@ -108,33 +138,32 @@
             justify-content: space-between;
             padding: 14px 16px;
             border-radius: 12px;
-            color: rgba(255,255,255,0.8);
+            color: var(--text-secondary);
             font-weight: 600;
             font-size: 0.95rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
+            white-space: nowrap;
         }
 
         .nav-item-left { display: flex; align-items: center; gap: 15px; }
-        .nav-item-left i { font-size: 1.1rem; width: 20px; text-align: center; }
+        .nav-item-left i { font-size: 1.1rem; width: 22px; text-align: center; }
 
-        .nav-item:hover { background-color: rgba(255,255,255,0.1); color: white; transform: translateX(5px); }
-        .nav-item.active { background-color: var(--maroon-light); color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .nav-item:hover { background-color: var(--bg-hover); color: var(--accent); }
+        .nav-item.active { background-color: var(--accent-light); color: var(--accent); }
 
-        /* Submenu Styling */
-        .submenu-container {
+        /* Accordion Submenu */
+        .submenu {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.4s ease;
-            background-color: rgba(0,0,0,0.15);
-            border-radius: 12px;
-            margin-top: 2px;
+            margin-left: 10px;
         }
-        .submenu-container.open { max-height: 250px; }
+        .submenu.open { max-height: 200px; }
         
         .sub-item {
-            padding: 12px 15px 12px 50px;
-            color: rgba(255,255,255,0.7);
+            padding: 10px 15px 10px 45px;
+            color: var(--text-secondary);
             font-size: 0.85rem;
             font-weight: 500;
             cursor: pointer;
@@ -142,332 +171,353 @@
             position: relative;
         }
         .sub-item::before {
-            content: ''; position: absolute; left: 30px; top: 50%; transform: translateY(-50%);
-            width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.3); transition: 0.3s;
+            content: ''; position: absolute; left: 24px; top: 50%; transform: translateY(-50%);
+            width: 5px; height: 5px; border-radius: 50%; background: var(--text-secondary); opacity: 0.5; transition: 0.3s;
         }
-        .sub-item:hover { color: white; }
-        .sub-item:hover::before { background: #fda4af; box-shadow: 0 0 8px #fda4af; }
-        .sub-item.active { color: white; font-weight: 700; }
-        .sub-item.active::before { background: #fda4af; }
+        .sub-item:hover { color: var(--accent); }
+        .sub-item:hover::before { background: var(--accent); opacity: 1; box-shadow: 0 0 5px var(--accent); }
+        .sub-item.active { color: var(--accent); font-weight: 700; }
+        .sub-item.active::before { background: var(--accent); opacity: 1; }
 
         .caret { transition: transform 0.3s ease; }
         .caret.rotate { transform: rotate(180deg); }
 
+        /* State Collapse Sidebar */
+        .sidebar.collapsed { width: 80px; }
+        .sidebar.collapsed .brand-logo span, 
+        .sidebar.collapsed .nav-item span,
+        .sidebar.collapsed .caret { display: none; }
+        .sidebar.collapsed .submenu { display: none !important; }
+        .sidebar.collapsed .sidebar-header { justify-content: center; padding: 0; gap: 0; }
+        .sidebar.collapsed .brand-logo { display: none; }
+        .sidebar.collapsed .nav-item { justify-content: center; padding: 14px 0; }
+        .sidebar.collapsed .nav-item-left { gap: 0; }
+
         /* =========================================================
-           3. MAIN CONTENT & HEADER
+           4. MAIN CONTENT & HEADER (SEAMLESS)
         ========================================================= */
-        .main-wrapper {
+        .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            position: relative;
+            background-color: var(--bg-surface);
+            border-top-left-radius: 30px; /* Memberikan efek container di dalam */
+            box-shadow: -5px 0 25px rgba(0,0,0,0.02);
+            transition: background-color 0.3s ease;
         }
+        [data-theme="dark"] .main-content { box-shadow: -5px 0 25px rgba(0,0,0,0.2); }
 
+        /* Header TANPA GARIS BAWAH */
         .header {
             height: 80px;
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--border);
+            background-color: transparent;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 0 30px;
-            z-index: 100;
-            transition: background-color 0.4s ease, border-color 0.4s ease;
+            justify-content: flex-end; /* Hanya isi kanan karena kiri sudah luas */
+            padding: 0 40px;
+            z-index: 10;
         }
 
-        .header-left { display: flex; align-items: center; gap: 20px; }
-        .menu-toggle { display: none; background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; }
-        .page-title { font-size: 1.4rem; font-weight: 800; color: var(--text-dark); transition: color 0.4s ease;}
+        .header-actions { display: flex; align-items: center; gap: 25px; position: relative; }
 
-        .header-right { display: flex; align-items: center; gap: 25px; position: relative; }
-
-        /* Notification Icon */
-        .notif-btn { position: relative; cursor: pointer; color: var(--text-muted); font-size: 1.3rem; transition: 0.3s; }
-        .notif-btn:hover { color: var(--maroon-main); }
-        .notif-badge {
-            position: absolute; top: -5px; right: -5px; background: #ef4444; color: white;
-            font-size: 0.6rem; font-weight: 800; padding: 2px 6px; border-radius: 20px; border: 2px solid var(--bg-card);
+        /* Notifikasi */
+        .btn-notif { position: relative; cursor: pointer; color: var(--text-secondary); font-size: 1.4rem; transition: 0.2s; }
+        .btn-notif:hover { color: var(--accent); }
+        .badge-notif {
+            position: absolute; top: -2px; right: -2px; background: var(--danger); color: white;
+            font-size: 0.6rem; font-weight: 800; padding: 2px 5px; border-radius: 50%; border: 2px solid var(--bg-surface);
         }
 
-        /* User Profile UI */
-        .user-profile { display: flex; align-items: center; gap: 15px; cursor: pointer; }
-        .user-info { text-align: right; }
-        .user-info h4 { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); transition: color 0.4s ease;}
-        .user-info p { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+        /* Profile Area */
+        .profile-trigger { display: flex; align-items: center; gap: 15px; cursor: pointer; }
+        .profile-info { text-align: right; }
+        .profile-info h4 { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+        .profile-info p { font-size: 0.75rem; color: var(--text-secondary); font-weight: 500; }
         
-        .avatar-circle {
+        .profile-img {
             width: 45px; height: 45px; border-radius: 50%;
-            background: url('https://ui-avatars.com/api/?name=Ners+Clara&background=831843&color=fff') center/cover;
-            border: 2px solid var(--border); transition: 0.3s;
+            background: url('https://ui-avatars.com/api/?name=Ners+Mawar&background=0ea5e9&color=fff') center/cover;
+            border: 2px solid transparent; transition: 0.3s;
         }
-        .user-profile:hover .avatar-circle { border-color: var(--maroon-main); box-shadow: 0 0 10px rgba(131, 24, 67, 0.2); }
+        .profile-trigger:hover .profile-img { border-color: var(--accent); }
 
-        /* Profile Dropdown Menu */
-        .profile-dropdown {
-            position: absolute; top: 60px; right: 0; width: 240px; background: var(--bg-card);
-            border-radius: 16px; box-shadow: var(--shadow-lg); border: 1px solid var(--border);
+        /* DROPDOWN PROFILE & DARK MODE SWITCH */
+        .dropdown-menu {
+            position: absolute; top: 60px; right: 0; width: 260px; background: var(--bg-surface);
+            border-radius: 16px; box-shadow: var(--shadow-dropdown); 
             opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease;
-            overflow: hidden;
+            overflow: hidden; z-index: 100; padding: 10px 0;
+            border: 1px solid rgba(148, 163, 184, 0.1);
         }
-        .profile-dropdown.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
         
         .dropdown-item {
-            padding: 15px 20px; display: flex; align-items: center; gap: 12px;
-            font-size: 0.9rem; font-weight: 600; color: var(--text-dark); cursor: pointer;
-            transition: 0.2s; border-bottom: 1px solid var(--border);
+            padding: 12px 20px; display: flex; align-items: center; gap: 15px;
+            font-size: 0.9rem; font-weight: 600; color: var(--text-primary); cursor: pointer;
+            transition: 0.2s;
         }
-        .dropdown-item:last-child { border-bottom: none; }
-        .dropdown-item:hover { background: var(--maroon-soft); color: var(--maroon-light); }
-        .dropdown-item i { font-size: 1.1rem; color: var(--maroon-main); width: 20px; text-align: center;}
+        .dropdown-item:hover { background: var(--bg-hover); color: var(--accent); }
+        .dropdown-item i { font-size: 1.1rem; color: var(--text-secondary); transition: 0.2s; width: 20px; text-align: center;}
+        .dropdown-item:hover i { color: var(--accent); }
 
-        /* SWITCH DARK MODE UI */
-        .toggle-item { justify-content: space-between; }
-        .switch-btn {
-            width: 44px; height: 24px; background: #cbd5e1; border-radius: 20px;
-            position: relative; transition: 0.4s ease;
+        .dropdown-divider { height: 1px; background: rgba(148, 163, 184, 0.1); margin: 8px 0; }
+
+        /* Dark Mode Switch UI */
+        .theme-switch-wrapper {
+            display: flex; align-items: center; justify-content: space-between; width: 100%;
         }
-        .switch-circle {
-            width: 18px; height: 18px; background: white; border-radius: 50%;
-            position: absolute; top: 3px; left: 3px; transition: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        .theme-switch {
+            position: relative; width: 44px; height: 24px; background: #cbd5e1;
+            border-radius: 20px; transition: 0.3s;
         }
-        
-        /* State saat Dark Mode aktif */
-        body.dark-mode .switch-btn { background: var(--maroon-main); }
-        body.dark-mode .switch-circle { transform: translateX(20px); }
-        body.dark-mode .profile-dropdown .dropdown-item i { color: #fda4af; }
-        body.dark-mode .profile-dropdown .dropdown-item:hover { color: white; }
+        .theme-switch::after {
+            content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px;
+            background: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        [data-theme="dark"] .theme-switch { background: var(--accent); }
+        [data-theme="dark"] .theme-switch::after { transform: translateX(20px); }
 
         /* =========================================================
-           4. PAGE CONTENT & SPA LOGIC
+           5. VIEW AREA (SPA) & CARDS
         ========================================================= */
-        .content-area {
-            flex: 1;
-            padding: 30px;
-            overflow-y: auto;
-            position: relative;
+        .view-area {
+            flex: 1; padding: 0 40px 40px 40px; overflow-y: auto;
         }
-        
-        .view-panel {
-            display: none;
-            animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .view-panel.active { display: block; }
+        .view-area::-webkit-scrollbar { display: none; }
 
-        @keyframes slideUpFade {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .page-view { display: none; animation: fadeIn 0.4s ease; }
+        .page-view.active { display: block; }
 
-        /* Dashboard Cards Template */
-        .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .card { 
-            background: var(--bg-card); border-radius: 20px; padding: 25px; 
-            box-shadow: var(--shadow-sm); border: 1px solid var(--border); 
-            transition: 0.3s; 
-        }
-        .card:hover { box-shadow: var(--shadow-md); transform: translateY(-5px); border-color: var(--maroon-main); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .page-header-title { font-size: 1.8rem; font-weight: 800; color: var(--text-primary); margin-bottom: 25px; }
+
+        .grid-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
         
-        /* Empty State Area */
-        .empty-state {
-            margin-top: 30px; background: var(--bg-card); border-radius: 20px; 
-            padding: 40px; text-align: center; border: 1px dashed var(--border);
-            transition: background-color 0.4s, border-color 0.4s;
+        .card-stat {
+            background: var(--bg-surface); padding: 25px; border-radius: 20px;
+            box-shadow: var(--shadow-card); border: 1px solid rgba(148, 163, 184, 0.1);
+            display: flex; align-items: center; gap: 20px; transition: 0.3s;
         }
+        .card-stat:hover { transform: translateY(-5px); border-color: var(--accent); }
+        
+        .stat-icon-box {
+            width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem;
+        }
+        .stat-text h3 { font-size: 2rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
+        .stat-text p { font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; margin-top: 5px; }
 
         /* =========================================================
-           5. ABSENSI MODAL (KAMERA)
+           6. CAMERA MODAL (ABSENSI)
         ========================================================= */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px);
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
             display: none; justify-content: center; align-items: center; z-index: 9999;
             opacity: 0; transition: opacity 0.3s;
         }
         .modal-overlay.active { display: flex; opacity: 1; }
 
         .modal-box {
-            background: var(--bg-card); width: 90%; max-width: 500px; border-radius: 24px;
-            overflow: hidden; box-shadow: var(--shadow-lg); transform: scale(0.9); transition: 0.3s;
-            border: 1px solid var(--border);
+            background: var(--bg-surface); width: 90%; max-width: 450px; border-radius: 24px;
+            overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); transform: scale(0.9); transition: 0.3s;
+            border: 1px solid rgba(148, 163, 184, 0.1);
         }
         .modal-overlay.active .modal-box { transform: scale(1); }
 
         .modal-header {
-            padding: 20px 25px; background: var(--maroon-main); color: white;
-            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 25px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
         }
-        .modal-header h3 { font-size: 1.2rem; font-weight: 700; }
-        .close-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+        .modal-header h3 { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); }
+        .btn-close { background: none; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer; transition: 0.2s;}
+        .btn-close:hover { color: var(--danger); }
 
         .camera-container { position: relative; width: 100%; height: 350px; background: #000; overflow: hidden; }
         #video-feed, #preview-img { width: 100%; height: 100%; object-fit: cover; }
         #preview-img { display: none; }
         
-        .modal-footer { padding: 20px; display: flex; gap: 15px; background: var(--bg-body); border-top: 1px solid var(--border); }
+        .modal-footer { padding: 20px; display: flex; gap: 15px; }
         
-        .btn {
-            flex: 1; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 1rem;
+        .btn-action {
+            flex: 1; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 0.95rem;
             cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
             border: none; transition: 0.2s;
         }
-        .btn-capture { background: var(--maroon-main); color: white; }
-        .btn-capture:hover { background: var(--maroon-light); }
-        .btn-retake { background: var(--bg-card); color: var(--text-dark); border: 1px solid var(--border); display: none; }
-        .btn-retake:hover { background: var(--border); }
-        .btn-save { background: #10b981; color: white; display: none; }
-        .btn-save:hover { background: #059669; }
+        .btn-capture { background: var(--accent); color: white; }
+        .btn-capture:hover { background: var(--accent-hover); }
+        .btn-retake { background: var(--bg-hover); color: var(--text-primary); display: none; }
+        .btn-save { background: var(--success); color: white; display: none; }
 
         /* =========================================================
-           6. RESPONSIVE DESIGN (HP & TABLET)
+           7. RESPONSIVE MOBILE
         ========================================================= */
-        .sidebar-overlay {
+        .mobile-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 990;
             display: none; opacity: 0; transition: 0.3s;
         }
 
-        @media (max-width: 1024px) {
-            .header-right .user-info { display: none; } 
-        }
-
         @media (max-width: 768px) {
-            .menu-toggle { display: block; }
             .sidebar { position: fixed; left: -100%; top: 0; bottom: 0; }
-            .sidebar.open { left: 0; }
-            .sidebar-overlay.show { display: block; opacity: 1; }
-            .content-area { padding: 15px; }
-            .page-title { font-size: 1.1rem; }
+            .sidebar.mobile-open { left: 0; width: 260px; }
+            .sidebar.mobile-open .brand-logo span, .sidebar.mobile-open .nav-item span { display: block; }
+            .mobile-overlay.show { display: block; opacity: 1; }
+            
+            .main-content { border-radius: 0; }
+            .header { padding: 0 20px; justify-content: space-between; }
+            .view-area { padding: 0 20px 20px 20px; }
+            
+            /* Tampilkan hamburger di header khusus mobile */
+            .header::before {
+                content: '\f0c9'; font-family: "Font Awesome 6 Free"; font-weight: 900;
+                font-size: 1.4rem; color: var(--text-secondary); cursor: pointer;
+            }
+            .header.clicked::before { content: ''; display: none; } /* Handle via JS */
         }
     </style>
 </head>
 <body>
 
-    <div class="sidebar-overlay" id="mobileOverlay" onclick="toggleMobileMenu()"></div>
-
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-brand">
-            <i class="fa-solid fa-staff-snake"></i> Nerstizen
-        </div>
+    <div class="app-layout">
         
-        <div class="nav-menu">
-            <div class="nav-item active" onclick="navigate('Dashboard', this)">
-                <div class="nav-item-left"><i class="fa-solid fa-chart-pie"></i> Dashboard</div>
+        <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebarMobile()"></div>
+
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <button class="btn-hamburger" id="btnHamburger" onclick="toggleSidebarDesktop()">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="brand-logo">
+                    <i class="fa-solid fa-kit-medical"></i> <span>Nerstizen</span>
+                </div>
             </div>
             
-            <div class="nav-item" onclick="navigate('Data Pasien', this)">
-                <div class="nav-item-left"><i class="fa-solid fa-users"></i> Data Pasien</div>
-            </div>
-
-            <div class="nav-item" onclick="navigate('SBAR', this)">
-                <div class="nav-item-left"><i class="fa-solid fa-walkie-talkie"></i> SBAR</div>
-            </div>
-
-            <div class="nav-item" onclick="toggleSubmenu('subAskep', this)">
-                <div class="nav-item-left"><i class="fa-solid fa-notes-medical"></i> Asuhan Keperawatan</div>
-                <i class="fa-solid fa-chevron-down caret"></i>
-            </div>
-            <div class="submenu-container" id="subAskep">
-                <div class="sub-item" onclick="navigate('Pengkajian', this, true)">Pengkajian</div>
-                <div class="sub-item" onclick="navigate('CPPT', this, true)">CPPT</div>
-                <div class="sub-item" onclick="navigate('Discharge Planing', this, true)">Discharge Planing</div>
-            </div>
-
-            <div class="nav-item" onclick="toggleSubmenu('subMonitor', this)">
-                <div class="nav-item-left"><i class="fa-solid fa-desktop"></i> Monitoring</div>
-                <i class="fa-solid fa-chevron-down caret"></i>
-            </div>
-            <div class="submenu-container" id="subMonitor">
-                <div class="sub-item" onclick="navigate('Lembar Obat', this, true)">Lembar Obat</div>
-                <div class="sub-item" onclick="navigate('Pengawasan Khusus', this, true)">Pengawasan Khusus</div>
-                <div class="sub-item" onclick="navigate('Early Warning', this, true)">Early Warning System</div>
-            </div>
-
-            <div class="nav-item" onclick="navigate('Administrasi', this)">
-                <div class="nav-item-left"><i class="fa-solid fa-folder-open"></i> Administrasi</div>
-            </div>
-        </div>
-    </aside>
-
-    <main class="main-wrapper">
-        
-        <header class="header">
-            <div class="header-left">
-                <button class="menu-toggle" onclick="toggleMobileMenu()"><i class="fa-solid fa-bars"></i></button>
-                <h1 class="page-title" id="pageTitleDisplay">Dashboard</h1>
-            </div>
-            
-            <div class="header-right">
-                <div class="notif-btn">
-                    <i class="fa-regular fa-bell"></i>
-                    <span class="notif-badge">3</span>
+            <nav class="sidebar-nav">
+                <div class="nav-item active" onclick="navigate('Dashboard', this)">
+                    <div class="nav-item-left"><i class="fa-solid fa-border-all"></i> <span>Dashboard</span></div>
                 </div>
                 
-                <div class="user-profile" onclick="toggleProfileDropdown(event)">
-                    <div class="user-info">
-                        <h4>Ners Clara, S.Kep</h4>
-                        <p>Shift Pagi - ICU</p>
-                    </div>
-                    <div class="avatar-circle"></div>
+                <div class="nav-item" onclick="navigate('Data Pasien', this)">
+                    <div class="nav-item-left"><i class="fa-solid fa-hospital-user"></i> <span>Data Pasien</span></div>
                 </div>
 
-                <div class="profile-dropdown" id="profileDropdown">
-                    <div class="dropdown-item" onclick="openAbsenModal()">
-                        <i class="fa-solid fa-camera-retro"></i> Absensi Kehadiran
-                    </div>
-                    <div class="dropdown-item" onclick="navigate('Profile')">
-                        <i class="fa-solid fa-user-nurse"></i> Profile Perawat
+                <div class="nav-item" onclick="navigate('SBAR', this)">
+                    <div class="nav-item-left"><i class="fa-solid fa-clipboard-list"></i> <span>SBAR</span></div>
+                </div>
+
+                <div class="nav-item" onclick="toggleSubmenu('subAskep', this)">
+                    <div class="nav-item-left"><i class="fa-solid fa-stethoscope"></i> <span>Asuhan Keperawatan</span></div>
+                    <i class="fa-solid fa-chevron-down caret"></i>
+                </div>
+                <div class="submenu" id="subAskep">
+                    <div class="sub-item" onclick="navigate('Pengkajian', this, true)">Pengkajian</div>
+                    <div class="sub-item" onclick="navigate('CPPT', this, true)">CPPT</div>
+                    <div class="sub-item" onclick="navigate('Discharge Planing', this, true)">Discharge Planing</div>
+                </div>
+
+                <div class="nav-item" onclick="toggleSubmenu('subMonitor', this)">
+                    <div class="nav-item-left"><i class="fa-solid fa-desktop"></i> <span>Monitoring</span></div>
+                    <i class="fa-solid fa-chevron-down caret"></i>
+                </div>
+                <div class="submenu" id="subMonitor">
+                    <div class="sub-item" onclick="navigate('Lembar Obat', this, true)">Lembar Obat</div>
+                    <div class="sub-item" onclick="navigate('Pengawasan Khusus', this, true)">Pengawasan Khusus</div>
+                    <div class="sub-item" onclick="navigate('Early Warning', this, true)">Early Warning</div>
+                </div>
+
+                <div class="nav-item" onclick="navigate('Administrasi', this)">
+                    <div class="nav-item-left"><i class="fa-solid fa-folder-open"></i> <span>Administrasi</span></div>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            
+            <header class="header">
+                <div style="flex:1; display:flex; align-items:center; height:100%;" class="mobile-menu-trigger" onclick="toggleSidebarMobile()"></div>
+                
+                <div class="header-actions">
+                    <div class="btn-notif">
+                        <i class="fa-regular fa-bell"></i>
+                        <span class="badge-notif">3</span>
                     </div>
                     
-                    <div class="dropdown-item toggle-item" onclick="toggleDarkMode(event)">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <i class="fa-solid fa-moon" id="darkModeIcon"></i> 
-                            <span id="darkModeText">Mode Gelap</span>
+                    <div class="profile-trigger" onclick="toggleProfileDropdown(event)">
+                        <div class="profile-info">
+                            <h4>Ners. Admin</h4>
+                            <p>Shift Pagi</p>
                         </div>
-                        <div class="switch-btn">
-                            <div class="switch-circle"></div>
-                        </div>
+                        <div class="profile-img"></div>
                     </div>
 
-                    <div class="dropdown-item" style="color: #ef4444;">
-                        <i class="fa-solid fa-arrow-right-from-bracket" style="color: #ef4444;"></i> Keluar
-                    </div>
-                </div>
-            </div>
-        </header>
+                    <div class="dropdown-menu" id="profileDropdown">
+                        <div class="dropdown-item" onclick="openAbsenModal()">
+                            <i class="fa-solid fa-camera-viewfinder"></i> Absensi Kehadiran
+                        </div>
+                        <div class="dropdown-item" onclick="navigate('Profile')">
+                            <i class="fa-regular fa-user"></i> Profile Saya
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        
+                        <div class="dropdown-item" onclick="toggleDarkMode(event)">
+                            <div class="theme-switch-wrapper">
+                                <div style="display:flex; align-items:center; gap:15px;">
+                                    <i class="fa-solid fa-moon" id="themeIcon"></i> <span id="themeText">Dark Mode</span>
+                                </div>
+                                <div class="theme-switch"></div>
+                            </div>
+                        </div>
 
-        <div class="content-area">
-            
-            <div id="dynamicContent" class="view-panel active">
-                <div class="grid-cards">
-                    <div class="card" style="border-top: 5px solid var(--maroon-main);">
-                        <h3 style="color: var(--maroon-main); font-size: 2.5rem; margin-bottom: 5px;">24</h3>
-                        <p style="color: var(--text-muted); font-weight: 600;">Total Pasien Aktif</p>
-                    </div>
-                    <div class="card" style="border-top: 5px solid #f59e0b;">
-                        <h3 style="color: #f59e0b; font-size: 2.5rem; margin-bottom: 5px;">5</h3>
-                        <p style="color: var(--text-muted); font-weight: 600;">Menunggu Tindakan</p>
-                    </div>
-                    <div class="card" style="border-top: 5px solid #10b981;">
-                        <h3 style="color: #10b981; font-size: 2.5rem; margin-bottom: 5px;">12</h3>
-                        <p style="color: var(--text-muted); font-weight: 600;">Selesai Askep</p>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item" style="color: var(--danger);">
+                            <i class="fa-solid fa-arrow-right-from-bracket" style="color: var(--danger);"></i> Keluar Sistem
+                        </div>
                     </div>
                 </div>
+            </header>
+
+            <div class="view-area">
                 
-                <div class="empty-state">
-                    <i class="fa-solid fa-laptop-medical fa-4x" style="color: #cbd5e1; margin-bottom: 20px;"></i>
-                    <h2 style="color: var(--text-dark);">Halaman <span id="welcomeText">Dashboard</span> Siap Digunakan</h2>
-                    <p style="color: var(--text-muted); margin-top: 10px;">Silakan integrasikan form dan tabel data Anda pada kontainer ini.</p>
-                </div>
-            </div>
+                <div id="dynamicContent" class="page-view active">
+                    <h2 class="page-header-title" id="pageTitleDisplay">Dashboard Monitor</h2>
+                    
+                    <div class="grid-dashboard">
+                        <div class="card-stat">
+                            <div class="stat-icon-box" style="background: var(--accent-light); color: var(--accent);">
+                                <i class="fa-solid fa-bed-pulse"></i>
+                            </div>
+                            <div class="stat-text"><h3>24</h3><p>Pasien Dirawat</p></div>
+                        </div>
+                        <div class="card-stat">
+                            <div class="stat-icon-box" style="background: rgba(239, 68, 68, 0.15); color: var(--danger);">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+                            <div class="stat-text"><h3>2</h3><p>EWS Alert (Kritis)</p></div>
+                        </div>
+                        <div class="card-stat">
+                            <div class="stat-icon-box" style="background: rgba(16, 185, 129, 0.15); color: var(--success);">
+                                <i class="fa-solid fa-clipboard-check"></i>
+                            </div>
+                            <div class="stat-text"><h3>18</h3><p>Askep Selesai</p></div>
+                        </div>
+                    </div>
 
-        </div>
-    </main>
+                    <div style="margin-top: 30px; background: transparent; border-radius: 20px; padding: 50px; text-align: center; border: 2px dashed rgba(148, 163, 184, 0.3);">
+                        <i class="fa-solid fa-laptop-medical fa-3x" style="color: var(--text-secondary); opacity: 0.5; margin-bottom: 20px;"></i>
+                        <h3 style="color: var(--text-primary); font-weight: 700;">Halaman Siap Digunakan</h3>
+                        <p style="color: var(--text-secondary); margin-top: 10px;">Area ini presisi dan merespons otomatis tema gelap/terang. Letakkan form EMR Nerstizen disini.</p>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
 
     <div class="modal-overlay" id="absenModal">
         <div class="modal-box">
             <div class="modal-header">
-                <h3>Absensi Kehadiran</h3>
-                <button class="close-btn" onclick="closeAbsenModal()"><i class="fa-solid fa-xmark"></i></button>
+                <h3><i class="fa-solid fa-camera-retro" style="color: var(--accent); margin-right: 8px;"></i> Absensi Ners</h3>
+                <button class="btn-close" onclick="closeAbsenModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
             <div class="camera-container">
@@ -477,13 +527,13 @@
             </div>
             
             <div class="modal-footer">
-                <button class="btn btn-capture" id="btnCapture" onclick="takeSnapshot()">
+                <button class="btn-action btn-capture" id="btnCapture" onclick="takeSnapshot()">
                     <i class="fa-solid fa-camera"></i> Ambil Foto
                 </button>
-                <button class="btn btn-retake" id="btnRetake" onclick="resetCamera()">
+                <button class="btn-action btn-retake" id="btnRetake" onclick="resetCamera()">
                     <i class="fa-solid fa-rotate-right"></i> Ulangi
                 </button>
-                <button class="btn btn-save" id="btnSaveAbsen" onclick="saveAbsen()">
+                <button class="btn-action btn-save" id="btnSaveAbsen" onclick="saveAbsen()">
                     <i class="fa-solid fa-cloud-arrow-up"></i> Simpan
                 </button>
             </div>
@@ -491,74 +541,66 @@
     </div>
 
     <script>
-        // --- LOGIKA DARK MODE (NEW) ---
-        function toggleDarkMode(event) {
-            // Mencegah dropdown tertutup saat switch diklik
-            event.stopPropagation(); 
-            
-            // Toggle class dark-mode di body
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            
-            // Ubah Ikon dan Teks
-            const icon = document.getElementById('darkModeIcon');
-            const text = document.getElementById('darkModeText');
-            
-            if(isDark) {
-                icon.classList.replace('fa-moon', 'fa-sun');
-                text.innerText = "Mode Terang";
-                localStorage.setItem('theme_nerstizen', 'dark'); // Simpan ke memory browser
+        // --- 1. DARK MODE LOGIC ---
+        function toggleDarkMode(e) {
+            e.stopPropagation(); // Mencegah dropdown tertutup saat di klik
+            const htmlEl = document.documentElement;
+            const currentTheme = htmlEl.getAttribute('data-theme');
+            const icon = document.getElementById('themeIcon');
+            const text = document.getElementById('themeText');
+
+            if (currentTheme === 'light') {
+                htmlEl.setAttribute('data-theme', 'dark');
+                icon.className = "fa-solid fa-sun";
+                text.innerText = "Light Mode";
             } else {
-                icon.classList.replace('fa-sun', 'fa-moon');
-                text.innerText = "Mode Gelap";
-                localStorage.setItem('theme_nerstizen', 'light');
+                htmlEl.setAttribute('data-theme', 'light');
+                icon.className = "fa-solid fa-moon";
+                text.innerText = "Dark Mode";
             }
         }
 
-        // Cek memory browser saat halaman pertama kali dimuat
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme_nerstizen');
-            if(savedTheme === 'dark') {
-                document.body.classList.add('dark-mode');
-                document.getElementById('darkModeIcon').classList.replace('fa-moon', 'fa-sun');
-                document.getElementById('darkModeText').innerText = "Mode Terang";
-            }
-        });
-
-        // --- LOGIKA NAVIGASI MENU & SPA ---
-        function navigate(pageName, element = null, isSub = false) {
-            document.getElementById('pageTitleDisplay').innerText = pageName;
-            document.getElementById('welcomeText').innerText = pageName;
-            
-            // Re-trigger animasi konten
-            const content = document.getElementById('dynamicContent');
-            content.classList.remove('active');
-            void content.offsetWidth; // Force reflow
-            content.classList.add('active');
-
-            // Hapus semua state active
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.sub-item').forEach(el => el.classList.remove('active'));
-
-            if (element) {
-                if (isSub) {
-                    element.classList.add('active');
-                    element.closest('.submenu-container').previousElementSibling.classList.add('active');
-                } else {
-                    element.classList.add('active');
-                    // Tutup semua accordion
-                    document.querySelectorAll('.submenu-container').forEach(sub => {
-                        sub.classList.remove('open');
-                        sub.previousElementSibling.querySelector('.caret').classList.remove('rotate');
-                    });
+        // --- 2. SIDEBAR DESKTOP (COLLAPSE / SANDWICH) ---
+        function toggleSidebarDesktop() {
+            const sidebar = document.getElementById('sidebar');
+            if(window.innerWidth > 768) {
+                sidebar.classList.toggle('collapsed');
+                // Tutup submenu jika di-collapse
+                if(sidebar.classList.contains('collapsed')) {
+                    document.querySelectorAll('.submenu').forEach(sub => sub.classList.remove('open'));
+                    document.querySelectorAll('.caret').forEach(c => c.classList.remove('rotate'));
                 }
             }
-
-            if(window.innerWidth <= 768) toggleMobileMenu();
         }
 
-        // --- LOGIKA ACCORDION SUBMENU ---
+        // --- 3. SIDEBAR MOBILE ---
+        function toggleSidebarMobile() {
+            if(window.innerWidth <= 768) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('mobileOverlay');
+                sidebar.classList.toggle('mobile-open');
+                overlay.classList.toggle('show');
+            }
+        }
+
+        // --- 4. DROPDOWN PROFILE ---
+        function toggleProfileDropdown(e) {
+            e.stopPropagation();
+            document.getElementById('profileDropdown').classList.toggle('show');
+        }
+        window.onclick = function(e) {
+            if (!e.target.closest('.profile-trigger') && !e.target.closest('.dropdown-menu')) {
+                document.getElementById('profileDropdown').classList.remove('show');
+            }
+        }
+
+        // --- 5. ACCORDION SUBMENU ---
         function toggleSubmenu(subId, element) {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar.classList.contains('collapsed')) {
+                sidebar.classList.remove('collapsed'); // Buka sidebar otomatis jika sedang kecil
+            }
+
             const sub = document.getElementById(subId);
             const caret = element.querySelector('.caret');
             
@@ -566,7 +608,8 @@
                 sub.classList.remove('open');
                 caret.classList.remove('rotate');
             } else {
-                document.querySelectorAll('.submenu-container').forEach(el => el.classList.remove('open'));
+                // Tutup yang lain
+                document.querySelectorAll('.submenu').forEach(el => el.classList.remove('open'));
                 document.querySelectorAll('.caret').forEach(el => el.classList.remove('rotate'));
                 
                 sub.classList.add('open');
@@ -574,27 +617,41 @@
             }
         }
 
-        // --- LOGIKA DROPDOWN PROFILE ---
-        function toggleProfileDropdown(event) {
-            event.stopPropagation();
-            document.getElementById('profileDropdown').classList.toggle('show');
-        }
+        // --- 6. NAVIGATION (SPA LOGIC) ---
+        function navigate(pageName, element = null, isSub = false) {
+            document.getElementById('pageTitleDisplay').innerText = pageName;
+            
+            // Animasi Refresh Konten
+            const content = document.getElementById('dynamicContent');
+            content.classList.remove('active');
+            void content.offsetWidth; // Force reflow
+            content.classList.add('active');
 
-        window.onclick = function(event) {
-            if (!event.target.closest('.user-profile') && !event.target.closest('.profile-dropdown')) {
-                document.getElementById('profileDropdown').classList.remove('show');
+            // Reset Active Class Menu
+            if (element && pageName !== 'Profile') {
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.sub-item').forEach(el => el.classList.remove('active'));
+
+                if (isSub) {
+                    element.classList.add('active');
+                    element.closest('.submenu').previousElementSibling.classList.add('active');
+                } else {
+                    element.classList.add('active');
+                    // Tutup submenu jika klik menu utama
+                    document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
+                    document.querySelectorAll('.caret').forEach(c => c.classList.remove('rotate'));
+                }
+            }
+
+            // Tutup dropdown dan mobile menu
+            document.getElementById('profileDropdown').classList.remove('show');
+            if(window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('mobile-open');
+                document.getElementById('mobileOverlay').classList.remove('show');
             }
         }
 
-        // --- LOGIKA MOBILE SIDEBAR ---
-        function toggleMobileMenu() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('mobileOverlay');
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('show');
-        }
-
-        // --- LOGIKA KAMERA ABSENSI ---
+        // --- 7. KAMERA ABSENSI ---
         let videoStream = null;
         const video = document.getElementById('video-feed');
         const canvas = document.getElementById('capture-canvas');
@@ -612,7 +669,7 @@
                 videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
                 video.srcObject = videoStream;
             } catch (err) {
-                alert("Gagal mengakses kamera. Pastikan izin kamera diberikan.");
+                alert("Gagal mengakses kamera. Izinkan akses kamera pada browser Anda.");
             }
         }
 
@@ -624,6 +681,7 @@
         }
 
         function takeSnapshot() {
+            // Auto Resize & Quality Control (800x600)
             const TARGET_WIDTH = 800;
             const TARGET_HEIGHT = 600;
             
@@ -631,21 +689,32 @@
             canvas.height = TARGET_HEIGHT;
             const ctx = canvas.getContext('2d');
             
+            // Gambar Video ke Canvas
             ctx.drawImage(video, 0, 0, TARGET_WIDTH, TARGET_HEIGHT);
             
+            // Gambar Overlay Timestamp (Hitam Transparan di bawah)
             const now = new Date();
             const timeString = now.toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' });
             
             ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
-            ctx.fillRect(0, TARGET_HEIGHT - 50, TARGET_WIDTH, 50);
+            ctx.fillRect(0, TARGET_HEIGHT - 60, TARGET_WIDTH, 60);
             
+            // Tulis Teks Kiri (Waktu)
+            ctx.textAlign = "left"; // Pastikan rata kiri untuk waktu
             ctx.fillStyle = "white";
-            ctx.font = "bold 20px 'Plus Jakarta Sans', sans-serif";
-            ctx.fillText("ABSEN: " + timeString, 20, TARGET_HEIGHT - 18);
-            ctx.fillText("Ners Clara, S.Kep", TARGET_WIDTH - 200, TARGET_HEIGHT - 18);
+            ctx.font = "bold 22px 'Plus Jakarta Sans', sans-serif";
+            ctx.fillText("Hadir: " + timeString, 20, TARGET_HEIGHT - 22);
+            
+            // Tulis Teks Kanan (Nama)
+            ctx.textAlign = "right"; // Set rata kanan
+            ctx.fillStyle = "#38bdf8"; // Warna aksen
+            // Cukup gunakan angka 20 (tanpa px)
+            ctx.fillText("Ners. Admin", TARGET_WIDTH - 20, TARGET_HEIGHT - 22);
 
+            // Export ke Image URL
             imgPreview.src = canvas.toDataURL('image/jpeg', 0.8);
             
+            // Switch UI
             video.style.display = 'none';
             imgPreview.style.display = 'block';
             btnCapture.style.display = 'none';
@@ -664,11 +733,14 @@
         }
 
         function saveAbsen() {
-            const base64Data = imgPreview.src;
+            const base64Image = imgPreview.src;
             btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+            
+            // Simulasi Proses Kirim Server
             setTimeout(() => {
-                alert("Absen berhasil disimpan!");
+                alert("Absen berhasil disimpan ke Database Nerstizen!");
                 closeAbsenModal();
+                btnSave.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Simpan';
             }, 1000);
         }
     </script>

@@ -1,20 +1,29 @@
 <?php
 // File: api.php
-
-// 1. Set Header untuk API (CORS & JSON)
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-// Handle preflight OPTIONS request (Biasa terjadi pada Fetch API)
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
-// 2. Panggil file konfigurasi database
-require_once 'config.local2.php';
+// --- PENDETEKSI OTOMATIS CONFIG PASSWORD ---
+// Cek apakah config ada di folder yang sama (EMR/)
+if (file_exists(__DIR__ . '/config.local2.php')) {
+    require_once __DIR__ . '/config.local2.php';
+} 
+// Jika tidak ada, cari di 1 tingkat ke atas (public_html/)
+else if (file_exists(__DIR__ . '/../config.local2.php')) {
+    require_once __DIR__ . '/../config.local2.php';
+} 
+// Jika tidak ada juga, hentikan sistem untuk keamanan
+else {
+    echo json_encode(["success" => false, "message" => "File konfigurasi database tidak ditemukan!"]);
+    exit();
+}
 
 // 3. Tangkap 'action' dari URL (?action=nama_aksi)
 $action = isset($_GET['action']) ? $_GET['action'] : '';
@@ -60,14 +69,13 @@ switch ($action) {
     // ==========================================
     case 'get_patients':
         try {
-            // Ambil semua data pasien, urutkan berdasarkan yang terbaru
+            // Ambil semua data pasien TERMASUK JK dan JAM_KES
             $stmt = $conn->prepare("
-                SELECT no_mr, nama_pasien, diagnosa, tgl_lahir, 
+                SELECT no_mr, nama_pasien, jk, jam_kes, diagnosa, tgl_lahir, 
                 DATE_FORMAT(tgl_lahir, '%d/%m/%Y') as tgl_lahir_indo,
                 IFNULL(created_at, 'Belum ada') as created_at
                 FROM pasien 
                 ORDER BY created_at DESC 
-                LIMIT 500
             ");
             $stmt->execute();
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -380,6 +380,26 @@
             }
             .header.clicked::before { content: ''; display: none; } /* Handle via JS */
         }
+        /* Container Pencarian */
+        .patient-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 20px; flex-wrap: wrap; }
+        .search-container { position: relative; flex: 1; max-width: 400px; }
+        .search-container i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
+        .search-container input { width: 100%; padding: 12px 12px 12px 45px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-primary); outline: none; transition: 0.3s; }
+        .search-container input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-light); }
+
+        /* Tabel Modern */
+        .table-responsive { background: var(--bg-surface); border-radius: 20px; box-shadow: var(--shadow-card); overflow: hidden; border: 1px solid rgba(148, 163, 184, 0.1); }
+        .modern-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .modern-table th { background: var(--bg-hover); padding: 18px 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .modern-table td { padding: 18px 20px; border-bottom: 1px solid rgba(148, 163, 184, 0.1); font-size: 0.9rem; color: var(--text-primary); }
+        .modern-table tr:hover { background-color: var(--bg-hover); }
+
+        /* Floating Action Button */
+        .fab-btn { position: fixed; bottom: 40px; right: 40px; width: 65px; height: 65px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 1.5rem; cursor: pointer; box-shadow: 0 10px 25px rgba(14, 165, 233, 0.4); transition: 0.3s; display: flex; align-items: center; justify-content: center; z-index: 900; }
+        .fab-btn:hover { transform: scale(1.1) rotate(90deg); background: var(--accent-hover); }
+
+        /* Badge Usia */
+        .age-badge { padding: 4px 10px; background: var(--accent-light); color: var(--accent); border-radius: 8px; font-weight: 700; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -399,11 +419,11 @@
             </div>
             
             <nav class="sidebar-nav">
-                <div class="nav-item active" onclick="navigate('Dashboard', this)">
+                <div class="nav-item active" onclick="navigate('Dashboard Monitor', 'view-dashboard', this)">
                     <div class="nav-item-left"><i class="fa-solid fa-border-all"></i> <span>Dashboard</span></div>
                 </div>
                 
-                <div class="nav-item" onclick="navigate('Data Pasien', this)">
+                <div class="nav-item" onclick="navigate('Database Pasien', 'view-pasien', this)">
                     <div class="nav-item-left"><i class="fa-solid fa-hospital-user"></i> <span>Data Pasien</span></div>
                 </div>
 
@@ -486,7 +506,7 @@
 
             <div class="view-area">
                 
-                <div id="dynamicContent" class="page-view active">
+                <div id="view-dashboard" class="page-view active">
                     <div class="grid-dashboard">
                         <div class="card-stat">
                             <div class="stat-icon-box" style="background: var(--accent-light); color: var(--accent);">
@@ -509,10 +529,49 @@
                     </div>
 
                     <div style="margin-top: 30px; background: transparent; border-radius: 20px; padding: 50px; text-align: center; border: 2px dashed rgba(148, 163, 184, 0.3);">
-                        <i class="fa-solid fa-laptop-medical fa-3x" style="color: var(--text-secondary); opacity: 0.5; margin-bottom: 20px;"></i>
-                        <h3 style="color: var(--text-primary); font-weight: 700;">Halaman Siap Digunakan</h3>
-                        <p style="color: var(--text-secondary); margin-top: 10px;">Area ini presisi dan merespons otomatis tema gelap/terang. Letakkan form EMR Nerstizen disini.</p>
+                        <i class="fa-solid fa-chart-line fa-3x" style="color: var(--text-secondary); opacity: 0.5; margin-bottom: 20px;"></i>
+                        <h3 style="color: var(--text-primary); font-weight: 700;">Grafik & Laporan</h3>
+                        <p style="color: var(--text-secondary); margin-top: 10px;">Area ini bisa diisi dengan Chart.js atau laporan ringkas nantinya.</p>
                     </div>
+                </div>
+
+                <div id="view-pasien" class="page-view">
+    
+                    <div class="patient-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                        <h2 class="page-header-title" style="margin: 0;">Database Pasien</h2>
+                        
+                        <div class="search-group" style="display: flex; gap: 10px; width: 100%; max-width: 450px;">
+                            <div style="position: relative; flex: 1;">
+                                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);"></i>
+                                <input type="text" id="patientSearch" placeholder="Cari Nama, MR, Usia, Dx..." style="width: 100%; padding: 12px 12px 12px 45px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-primary); outline: none; transition: 0.3s;">
+                            </div>
+                            <button onclick="filterPatientTable()" style="background: var(--accent); color: white; border: none; padding: 0 20px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(14, 165, 233, 0.2);">
+                                <i class="fa-solid fa-search" style="margin-right: 5px;"></i> Cari
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive" style="background: var(--bg-surface); border-radius: 20px; box-shadow: var(--shadow-card); overflow: hidden; border: 1px solid rgba(148, 163, 184, 0.1);">
+                        <table class="modern-table" id="tablePasien" style="width: 100%; border-collapse: collapse; text-align: left;">
+                            <thead>
+                                <tr style="background: var(--bg-hover);">
+                                    <th style="padding: 18px 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">No. MR</th>
+                                    <th style="padding: 18px 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Nama Pasien</th>
+                                    <th style="padding: 18px 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">L/P</th>
+                                    <th style="padding: 18px 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Tgl Lahir</th>
+                                    <th style="padding: 18px 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Usia</th>
+                                    <th style="padding: 18px 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Jaminan</th>
+                                    <th style="padding: 18px 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Diagnosa</th>
+                                </tr>
+                            </thead>
+                            <tbody id="patientTableBody">
+                                </tbody>
+                        </table>
+                    </div>
+
+                    <button class="fab-btn" onclick="openAddPatientModal()" style="position: fixed; bottom: 40px; right: 40px; width: 65px; height: 65px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 1.5rem; cursor: pointer; box-shadow: 0 10px 25px rgba(14, 165, 233, 0.4); display: flex; align-items: center; justify-content: center; z-index: 900; transition: 0.3s;">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </button>
                 </div>
             </div>
         </main>
@@ -546,6 +605,12 @@
     </div>
 
     <script>
+
+        // --- KONFIGURASI API UTAMA ---
+        // Jika sudah di hosting / folder yang sama:
+        const API_URL = 'api.php'
+
+
         // --- 1. DARK MODE LOGIC ---
         function toggleDarkMode(e) {
             e.stopPropagation(); // Mencegah dropdown tertutup saat di klik
@@ -623,17 +688,27 @@
         }
 
         // --- 6. NAVIGATION (SPA LOGIC) ---
-        function navigate(pageName, element = null, isSub = false) {
-            document.getElementById('pageTitleDisplay').innerText = pageName;
+        function navigate(pageTitle, targetViewId, element = null, isSub = false) {
+            // 1. Ubah Judul Header Atas
+            document.getElementById('pageTitleDisplay').innerText = pageTitle;
             
-            // Animasi Refresh Konten
-            const content = document.getElementById('dynamicContent');
-            content.classList.remove('active');
-            void content.offsetWidth; // Force reflow
-            content.classList.add('active');
+            // 2. Sembunyikan SEMUA halaman
+            const allViews = document.querySelectorAll('.page-view');
+            allViews.forEach(view => {
+                view.classList.remove('active');
+            });
 
-            // Reset Active Class Menu
-            if (element && pageName !== 'Profile') {
+            // 3. Munculkan halaman yang dituju saja
+            if (targetViewId) {
+                const targetView = document.getElementById(targetViewId);
+                if (targetView) {
+                    void targetView.offsetWidth; // Force reflow untuk trigger animasi fadeIn
+                    targetView.classList.add('active');
+                }
+            }
+
+            // 4. Reset & Set Class 'active' pada menu Sidebar
+            if (element && pageTitle !== 'Profile') {
                 document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
                 document.querySelectorAll('.sub-item').forEach(el => el.classList.remove('active'));
 
@@ -648,7 +723,7 @@
                 }
             }
 
-            // Tutup dropdown dan mobile menu
+            // 5. Tutup dropdown dan mobile menu jika di HP
             document.getElementById('profileDropdown').classList.remove('show');
             if(window.innerWidth <= 768) {
                 document.getElementById('sidebar').classList.remove('mobile-open');
@@ -747,6 +822,137 @@
                 closeAbsenModal();
                 btnSave.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Simpan';
             }, 1000);
+        }
+
+        // --- 1. HITUNG USIA OTOMATIS ---
+        function calculateAge(birthDateString) {
+            if (!birthDateString || birthDateString === '1970-01-01') return "?";
+            const today = new Date();
+            const birthDate = new Date(birthDateString);
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age + " Thn";
+        }
+
+        // --- 2. LOAD DATA PASIEN DARI API ---
+        async function loadPatients() {
+            try {
+                // GUNAKAN VARIABEL API_URL DI SINI
+                const response = await fetch(`${API_URL}?action=get_patients`);
+                const patients = await response.json();
+                
+                console.log("Respon dari PHP:", patients);
+
+                const tableBody = document.getElementById('patientTableBody');
+                tableBody.innerHTML = ''; 
+                
+                // CEK ERROR DATABASE
+                if (patients.success === false || patients.error) {
+                    tableBody.innerHTML = `<tr><td colspan="7" style="padding: 20px; text-align: center; color: var(--danger); font-weight: bold;">⚠️ Gagal Mengambil Data: ${patients.message || patients.error}</td></tr>`;
+                    return;
+                }
+
+                // CEK FORMAT DATA
+                if (!Array.isArray(patients)) {
+                    tableBody.innerHTML = `<tr><td colspan="7" style="padding: 20px; text-align: center; color: var(--danger); font-weight: bold;">⚠️ Format data dari server tidak valid.</td></tr>`;
+                    return;
+                }
+
+                patients.forEach(p => {
+                    const age = calculateAge(p.tgl_lahir);
+                    
+                    // Badge Jaminan Kesehatan
+                    let badgeJamKes = `<span style="background:#e0f2fe; color:#0ea5e9; padding:4px 10px; border-radius:8px; font-size:0.8rem; font-weight:700;">${p.jam_kes || '-'}</span>`;
+                    if(p.jam_kes && p.jam_kes.toLowerCase().includes('umum')) {
+                        badgeJamKes = `<span style="background:#fce7f3; color:#db2777; padding:4px 10px; border-radius:8px; font-size:0.8rem; font-weight:700;">${p.jam_kes}</span>`;
+                    }
+
+                    // TAMPILAN BARIS TABEL 
+                    const row = `
+                        <tr class="patient-row">
+                            <td style="padding: 18px 20px; font-weight:700; color:var(--accent); border-bottom: 1px solid rgba(148, 163, 184, 0.1);">${p.no_mr}</td>
+                            <td style="padding: 18px 20px; font-weight:600; border-bottom: 1px solid rgba(148, 163, 184, 0.1);">${p.nama_pasien}</td>
+                            <td style="padding: 18px 20px; border-bottom: 1px solid rgba(148, 163, 184, 0.1);">${p.jk || '-'}</td>
+                            <td style="padding: 18px 20px; border-bottom: 1px solid rgba(148, 163, 184, 0.1);">${p.tgl_lahir_indo}</td>
+                            
+                            <td style="padding: 18px 20px; border-bottom: 1px solid rgba(148, 163, 184, 0.1);">
+                                <span style="background:var(--accent-light); color:var(--accent); padding:4px 10px; border-radius:8px; font-size:0.85rem; font-weight:800;">${age}</span>
+                            </td>
+                            
+                            <td style="padding: 18px 20px; border-bottom: 1px solid rgba(148, 163, 184, 0.1);">${badgeJamKes}</td>
+                            <td style="padding: 18px 20px; border-bottom: 1px solid rgba(148, 163, 184, 0.1);">${p.diagnosa || '-'}</td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error("Gagal memuat data pasien:", error);
+                document.getElementById('patientTableBody').innerHTML = `<tr><td colspan="7" style="padding: 20px; text-align: center; color: var(--danger); font-weight: bold;">⚠️ Terjadi kesalahan jaringan / PHP error. Cek console.</td></tr>`;
+            }
+        }
+
+        // --- 3. FITUR PENCARIAN (BISA KLIK TOMBOL ATAU TEKAN ENTER) ---
+        function filterPatientTable() {
+            const input = document.getElementById("patientSearch").value.toUpperCase();
+            const table = document.getElementById("tablePasien");
+            const tr = table.getElementsByClassName("patient-row"); 
+
+            for (let i = 0; i < tr.length; i++) {
+                let rowText = tr[i].textContent || tr[i].innerText;
+                if (rowText.toUpperCase().indexOf(input) > -1) {
+                    tr[i].style.display = ""; 
+                } else {
+                    tr[i].style.display = "none"; 
+                }
+            }
+        }
+
+        // Tambahkan Listener untuk mendeteksi tombol "Enter" di keyboard
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPatients(); // Panggil data saat awal
+
+            // Fungsi Enter pada Input Pencarian
+            const searchInput = document.getElementById("patientSearch");
+            if(searchInput) {
+                searchInput.addEventListener("keypress", function(event) {
+                    if (event.key === "Enter") {
+                        event.preventDefault(); // Mencegah reload form bawaan browser
+                        filterPatientTable();   // Jalankan pencarian
+                    }
+                });
+            }
+        });
+
+        // --- 4. MODAL TAMBAH PASIEN ---
+        function openAddPatientModal() { document.getElementById('addPatientModal').classList.add('active'); }
+        function closeAddPatientModal() { document.getElementById('addPatientModal').classList.remove('active'); }
+
+        async function submitNewPatient() {
+            const data = {
+                mr: document.getElementById('newMR').value,
+                nama: document.getElementById('newNama').value,
+                tgl_lahir: document.getElementById('newTglLahir').value,
+                dx: document.getElementById('newDx').value
+            };
+
+            // GUNAKAN VARIABEL API_URL DI SINI JUGA
+            const response = await fetch(`${API_URL}?action=add_patient`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            
+            const res = await response.json();
+            if(res.success) {
+                alert("Pasien Berhasil Ditambahkan!");
+                closeAddPatientModal();
+                loadPatients(); // Refresh tabel otomatis
+            } else {
+                alert("Gagal: " + res.message);
+            }
         }
     </script>
 </body>

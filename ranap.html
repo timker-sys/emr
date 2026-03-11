@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nerstizen - Sistem Keperawatan Modern</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* =========================================================
+           1. CSS VARIABLES (LIGHT & DARK THEME)
+        ========================================================= */
+        :root {
+            /* Tema Terang (Light Mode) */
+            --bg-main: #f4f7f9;        /* Warna latar belakang terluar (opsional) */
+            --bg-surface: #ffffff;     /* Warna Sidebar, Header, Container (Putih menyatu) */
+            --bg-hover: #f1f5f9;       /* Efek hover menu */
+            
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            
+            --accent: #0ea5e9;         /* Nurse Blue / Sky Blue */
+            --accent-hover: #0284c7;
+            --accent-light: #e0f2fe;
+            
+            --danger: #ef4444;
+            --success: #10b981;
+            
+            --shadow-dropdown: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.03);
+            
+            --sidebar-width: 260px;
+        }
+
+        /* Tema Gelap (Dark Mode) */
+        [data-theme="dark"] {
+            --bg-main: #0f172a;        /* Latar belakang terluar gelap */
+            --bg-surface: #1e293b;     /* Sidebar, Header, Container gelap menyatu */
+            --bg-hover: #334155;
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            
+            --accent: #38bdf8;
+            --accent-hover: #7dd3fc;
+            --accent-light: rgba(56, 189, 248, 0.15);
+            
+            --shadow-dropdown: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* =========================================================
+           2. GLOBAL RESET & BASE
+        ========================================================= */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            overflow: hidden; /* Mencegah scroll double */
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* =========================================================
+           3. LAYOUT & SIDEBAR
+        ========================================================= */
+        .app-layout {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Sidebar menyatu dengan warna container */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-surface);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.02);
+        }
+
+        /* Hamburger di kiri Logo */
+        .sidebar-header {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 15px;
+        }
+
+        .btn-hamburger {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+        }
+        .btn-hamburger:hover { background-color: var(--bg-hover); color: var(--accent); }
+
+        .brand-logo {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+        }
+        .brand-logo i { color: var(--accent); }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 10px 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .sidebar-nav::-webkit-scrollbar { display: none; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .nav-item-left { display: flex; align-items: center; gap: 15px; }
+        .nav-item-left i { font-size: 1.1rem; width: 22px; text-align: center; }
+
+        .nav-item:hover { background-color: var(--bg-hover); color: var(--accent); }
+        .nav-item.active { background-color: var(--accent-light); color: var(--accent); }
+
+        /* Accordion Submenu */
+        .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            margin-left: 10px;
+        }
+        .submenu.open { max-height: 200px; }
+        
+        .sub-item {
+            padding: 10px 15px 10px 45px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .sub-item::before {
+            content: ''; position: absolute; left: 24px; top: 50%; transform: translateY(-50%);
+            width: 5px; height: 5px; border-radius: 50%; background: var(--text-secondary); opacity: 0.5; transition: 0.3s;
+        }
+        .sub-item:hover { color: var(--accent); }
+        .sub-item:hover::before { background: var(--accent); opacity: 1; box-shadow: 0 0 5px var(--accent); }
+        .sub-item.active { color: var(--accent); font-weight: 700; }
+        .sub-item.active::before { background: var(--accent); opacity: 1; }
+
+        .caret { transition: transform 0.3s ease; }
+        .caret.rotate { transform: rotate(180deg); }
+
+        /* State Collapse Sidebar */
+        .sidebar.collapsed { width: 80px; }
+        .sidebar.collapsed .brand-logo span, 
+        .sidebar.collapsed .nav-item span,
+        .sidebar.collapsed .caret { display: none; }
+        .sidebar.collapsed .submenu { display: none !important; }
+        .sidebar.collapsed .sidebar-header { justify-content: center; padding: 0; gap: 0; }
+        .sidebar.collapsed .brand-logo { display: none; }
+        .sidebar.collapsed .nav-item { justify-content: center; padding: 14px 0; }
+        .sidebar.collapsed .nav-item-left { gap: 0; }
+
+        /* =========================================================
+           4. MAIN CONTENT & HEADER (SEAMLESS)
+        ========================================================= */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-color: var(--bg-surface);
+            border-top-left-radius: 0px; /* Memberikan efek container di dalam */
+            box-shadow: -5px 0 25px rgba(0,0,0,0.02);
+            transition: background-color 0.3s ease;
+        }
+        [data-theme="dark"] .main-content { box-shadow: -5px 0 25px rgba(0,0,0,0.2); }
+
+        /* Header TANPA GARIS BAWAH */
+        .header {
+            height: 80px;
+            background-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 10;
+            margin-bottom: 20px;
+        }
+        /* Container judul di kiri header */
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-actions { display: flex; align-items: center; gap: 25px; position: relative; }
+
+        /* Notifikasi */
+        .btn-notif { position: relative; cursor: pointer; color: var(--text-secondary); font-size: 1.4rem; transition: 0.2s; }
+        .btn-notif:hover { color: var(--accent); }
+        .badge-notif {
+            position: absolute; top: -2px; right: -2px; background: var(--danger); color: white;
+            font-size: 0.6rem; font-weight: 800; padding: 2px 5px; border-radius: 50%; border: 2px solid var(--bg-surface);
+        }
+
+        /* Profile Area */
+        .profile-trigger { display: flex; align-items: center; gap: 15px; cursor: pointer; }
+        .profile-info { text-align: right; }
+        .profile-info h4 { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+        .profile-info p { font-size: 0.75rem; color: var(--text-secondary); font-weight: 500; }
+        
+        .profile-img {
+            width: 45px; height: 45px; border-radius: 50%;
+            background: url('https://ui-avatars.com/api/?name=Ners+Mawar&background=0ea5e9&color=fff') center/cover;
+            border: 2px solid transparent; transition: 0.3s;
+        }
+        .profile-trigger:hover .profile-img { border-color: var(--accent); }
+
+        /* DROPDOWN PROFILE & DARK MODE SWITCH */
+        .dropdown-menu {
+            position: absolute; top: 60px; right: 0; width: 260px; background: var(--bg-surface);
+            border-radius: 16px; box-shadow: var(--shadow-dropdown); 
+            opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease;
+            overflow: hidden; z-index: 100; padding: 10px 0;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        .dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        
+        .dropdown-item {
+            padding: 12px 20px; display: flex; align-items: center; gap: 15px;
+            font-size: 0.9rem; font-weight: 600; color: var(--text-primary); cursor: pointer;
+            transition: 0.2s;
+        }
+        .dropdown-item:hover { background: var(--bg-hover); color: var(--accent); }
+        .dropdown-item i { font-size: 1.1rem; color: var(--text-secondary); transition: 0.2s; width: 20px; text-align: center;}
+        .dropdown-item:hover i { color: var(--accent); }
+
+        .dropdown-divider { height: 1px; background: rgba(148, 163, 184, 0.1); margin: 8px 0; }
+
+        /* Dark Mode Switch UI */
+        .theme-switch-wrapper {
+            display: flex; align-items: center; justify-content: space-between; width: 100%;
+        }
+        .theme-switch {
+            position: relative; width: 44px; height: 24px; background: #cbd5e1;
+            border-radius: 20px; transition: 0.3s;
+        }
+        .theme-switch::after {
+            content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px;
+            background: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        [data-theme="dark"] .theme-switch { background: var(--accent); }
+        [data-theme="dark"] .theme-switch::after { transform: translateX(20px); }
+
+        /* =========================================================
+           5. VIEW AREA (SPA) & CARDS
+        ========================================================= */
+        .view-area {
+            flex: 1; padding: 0 40px 40px 40px; overflow-y: auto;
+        }
+        .view-area::-webkit-scrollbar { display: none; }
+
+        .page-view { display: none; animation: fadeIn 0.4s ease; }
+        .page-view.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .page-header-title { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); white-space: nowrap; margin-bottom: 0px; }
+
+        .grid-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        
+        .card-stat {
+            background: var(--bg-surface); padding: 25px; border-radius: 20px;
+            box-shadow: var(--shadow-card); border: 1px solid rgba(148, 163, 184, 0.1);
+            display: flex; align-items: center; gap: 20px; transition: 0.3s; margin-top: 20px;
+        }
+        .card-stat:hover { transform: translateY(-5px); border-color: var(--accent); }
+        
+        .stat-icon-box {
+            width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem;
+        }
+        .stat-text h3 { font-size: 2rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
+        .stat-text p { font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; margin-top: 5px; }
+
+        /* =========================================================
+           6. CAMERA MODAL (ABSENSI)
+        ========================================================= */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
+            display: none; justify-content: center; align-items: center; z-index: 9999;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+
+        .modal-box {
+            background: var(--bg-surface); width: 90%; max-width: 450px; border-radius: 24px;
+            overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); transform: scale(0.9); transition: 0.3s;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        .modal-overlay.active .modal-box { transform: scale(1); }
+
+        .modal-header {
+            padding: 20px 25px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        .modal-header h3 { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); }
+        .btn-close { background: none; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer; transition: 0.2s;}
+        .btn-close:hover { color: var(--danger); }
+
+        .camera-container { position: relative; width: 100%; height: 350px; background: #000; overflow: hidden; }
+        #video-feed, #preview-img { width: 100%; height: 100%; object-fit: cover; }
+        #preview-img { display: none; }
+        
+        .modal-footer { padding: 20px; display: flex; gap: 15px; }
+        
+        .btn-action {
+            flex: 1; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 0.95rem;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+            border: none; transition: 0.2s;
+        }
+        .btn-capture { background: var(--accent); color: white; }
+        .btn-capture:hover { background: var(--accent-hover); }
+        .btn-retake { background: var(--bg-hover); color: var(--text-primary); display: none; }
+        .btn-save { background: var(--success); color: white; display: none; }
+
+        /* =========================================================
+           7. RESPONSIVE MOBILE
+        ========================================================= */
+        .mobile-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 990;
+            display: none; opacity: 0; transition: 0.3s;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; left: -100%; top: 0; bottom: 0; }
+            .sidebar.mobile-open { left: 0; width: 260px; }
+            .sidebar.mobile-open .brand-logo span, .sidebar.mobile-open .nav-item span { display: block; }
+            .mobile-overlay.show { display: block; opacity: 1; }
+            
+            .main-content { border-radius: 0; }
+            .header { padding: 0 20px; justify-content: space-between; }
+            .view-area { flex: 1; padding: 10px 40px 40px 40px; overflow-y: auto; }
+            
+            /* Tampilkan hamburger di header khusus mobile */
+            .header::before {
+                content: '\f0c9'; font-family: "Font Awesome 6 Free"; font-weight: 900;
+                font-size: 1.4rem; color: var(--text-secondary); cursor: pointer;
+            }
+            .header.clicked::before { content: ''; display: none; } /* Handle via JS */
+        }
+        /* Container Pencarian */
+        .patient-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 20px; flex-wrap: wrap; }
+        .search-container { position: relative; flex: 1; max-width: 400px; }
+        .search-container i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
+        .search-container input { width: 100%; padding: 12px 12px 12px 45px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-primary); outline: none; transition: 0.3s; }
+        .search-container input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-light); }
+
+        /* Tabel Modern */
+        .table-responsive { background: var(--bg-surface); border-radius: 20px; box-shadow: var(--shadow-card); overflow: hidden; border: 1px solid rgba(148, 163, 184, 0.1); }
+        .modern-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .modern-table th { background: var(--bg-hover); padding: 18px 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .modern-table td { padding: 18px 20px; border-bottom: 1px solid rgba(148, 163, 184, 0.1); font-size: 0.9rem; color: var(--text-primary); }
+        .modern-table tr:hover { background-color: var(--bg-hover); }
+
+        /* Floating Action Button */
+        .fab-btn { position: fixed; bottom: 40px; right: 40px; width: 65px; height: 65px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 1.5rem; cursor: pointer; box-shadow: 0 10px 25px rgba(14, 165, 233, 0.4); transition: 0.3s; display: flex; align-items: center; justify-content: center; z-index: 900; }
+        .fab-btn:hover { transform: scale(1.1) rotate(90deg); background: var(--accent-hover); }
+
+        /* Badge Usia */
+        .age-badge { padding: 4px 10px; background: var(--accent-light); color: var(--accent); border-radius: 8px; font-weight: 700; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+    <div class="app-layout">
+        
+        <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebarMobile()"></div>
+
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <button class="btn-hamburger" id="btnHamburger" onclick="toggleSidebarDesktop()">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="brand-logo">
+                    <i class="fa-solid fa-kit-medical"></i> <span>Nerstizen</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-item active" onclick="navigate('Dashboard Monitor', 'view-dashboard', this)">
+                    <div class="nav-item-left"><i class="fa-solid fa-border-all"></i> <span>Dashboard</span></div>
+                </div>
+                
+                <div class="nav-item" onclick="navigate('Database Pasien', 'view-pasien', this)">
+                    <div class="nav-item-left"><i class="fa-solid fa-hospital-user"></i> <span>Data Pasien</span></div>
+                </div>
+
+                <div class="nav-item" onclick="navigate('SBAR', this)">
+                    <div class="nav-item-left"><i class="fa-solid fa-clipboard-list"></i> <span>SBAR</span></div>
+                </div>
+
+                <div class="nav-item" onclick="toggleSubmenu('subAskep', this)">
+                    <div class="nav-item-left"><i class="fa-solid fa-stethoscope"></i> <span>Asuhan Keperawatan</span></div>
+                    <i class="fa-solid fa-chevron-down caret"></i>
+                </div>
+                <div class="submenu" id="subAskep">
+                    <div class="sub-item" onclick="navigate('Pengkajian', this, true)">Pengkajian</div>
+                    <div class="sub-item" onclick="navigate('CPPT', this, true)">CPPT</div>
+                    <div class="sub-item" onclick="navigate('Discharge Planing', this, true)">Discharge Planing</div>
+                </div>
+
+                <div class="nav-item" onclick="toggleSubmenu('subMonitor', this)">
+                    <div class="nav-item-left"><i class="fa-solid fa-desktop"></i> <span>Monitoring</span></div>
+                    <i class="fa-solid fa-chevron-down caret"></i>
+                </div>
+                <div class="submenu" id="subMonitor">
+                    <div class="sub-item" onclick="navigate('Lembar Obat', this, true)">Lembar Obat</div>
+                    <div class="sub-item" onclick="navigate('Pengawasan Khusus', this, true)">Pengawasan Khusus</div>
+                    <div class="sub-item" onclick="navigate('Early Warning', this, true)">Early Warning</div>
+                </div>
+
+                <div class="nav-item" onclick="navigate('Administrasi', this)">
+                    <div class="nav-item-left"><i class="fa-solid fa-folder-open"></i> <span>Administrasi</span></div>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            
+            <header class="header">
+                <div class="header-left">
+                    <h2 class="page-header-title" id="pageTitleDisplay">Dashboard Monitor</h2>
+                </div>
+                
+                <div class="header-actions">
+                    <div class="btn-notif">
+                        <i class="fa-regular fa-bell"></i>
+                        <span class="badge-notif">3</span>
+                    </div>
+                    
+                    <div class="profile-trigger" onclick="toggleProfileDropdown(event)">
+                        <div class="profile-info">
+                            <h4>Ners. Admin</h4>
+                            <p>Shift Pagi</p>
+                        </div>
+                        <div class="profile-img"></div>
+                    </div>
+
+                    <div class="dropdown-menu" id="profileDropdown">
+                        <div class="dropdown-item" onclick="openAbsenModal()">
+                            <i class="fa-solid fa-camera-viewfinder"></i> Absensi Kehadiran
+                        </div>
+                        <div class="dropdown-item" onclick="navigate('Profile')">
+                            <i class="fa-regular fa-user"></i> Profile Saya
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        
+                        <div class="dropdown-item" onclick="toggleDarkMode(event)">
+                            <div class="theme-switch-wrapper">
+                                <div style="display:flex; align-items:center; gap:15px;">
+                                    <i class="fa-solid fa-moon" id="themeIcon"></i> <span id="themeText">Dark Mode</span>
+                                </div>
+                                <div class="theme-switch"></div>
+                            </div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item" style="color: var(--danger);">
+                            <i class="fa-solid fa-arrow-right-from-bracket" style="color: var(--danger);"></i> Keluar Sistem
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="view-area">
+                
+                <div id="view-dashboard" class="page-view active">
+                    <div class="grid-dashboard">
+                        <div class="card-stat">
+                            <div class="stat-icon-box" style="background: var(--accent-light); color: var(--accent);">
+                                <i class="fa-solid fa-bed-pulse"></i>
+                            </div>
+                            <div class="stat-text"><h3>24</h3><p>Pasien Dirawat</p></div>
+                        </div>
+                        <div class="card-stat">
+                            <div class="stat-icon-box" style="background: rgba(239, 68, 68, 0.15); color: var(--danger);">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+                            <div class="stat-text"><h3>2</h3><p>EWS Alert (Kritis)</p></div>
+                        </div>
+                        <div class="card-stat">
+                            <div class="stat-icon-box" style="background: rgba(16, 185, 129, 0.15); color: var(--success);">
+                                <i class="fa-solid fa-clipboard-check"></i>
+                            </div>
+                            <div class="stat-text"><h3>18</h3><p>Askep Selesai</p></div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px; background: transparent; border-radius: 20px; padding: 50px; text-align: center; border: 2px dashed rgba(148, 163, 184, 0.3);">
+                        <i class="fa-solid fa-chart-line fa-3x" style="color: var(--text-secondary); opacity: 0.5; margin-bottom: 20px;"></i>
+                        <h3 style="color: var(--text-primary); font-weight: 700;">Grafik & Laporan</h3>
+                        <p style="color: var(--text-secondary); margin-top: 10px;">Area ini bisa diisi dengan Chart.js atau laporan ringkas nantinya.</p>
+                    </div>
+                </div>
+
+                <div id="view-pasien" class="page-view">
+    
+                    <div class="patient-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                        <h2 class="page-header-title" style="margin: 0;">Database Pasien</h2>
+                        
+                        <div class="search-group" style="display: flex; gap: 10px; width: 100%; max-width: 450px;">
+                            <div style="position: relative; flex: 1;">
+                                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);"></i>
+                                <input type="text" id="patientSearch" placeholder="Cari Nama, MR, Usia, Dx..." style="width: 100%; padding: 12px 12px 12px 45px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-primary); outline: none; transition: 0.3s;">
+                            </div>
+                            <button onclick="filterPatientTable()" style="background: var(--accent); color: white; border: none; padding: 0 20px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(14, 165, 233, 0.2);">
+                                <i class="fa-solid fa-search" style="margin-right: 5px;"></i> Cari
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive" style="background: var(--bg-surface); border-radius: 20px; box-shadow: var(--shadow-card); overflow: hidden; border: 1px solid rgba(148, 163, 184, 0.1);">
+                        <table class="modern-table" id="tablePasien" style="width: 100%; border-collapse: collapse; text-align: left;">
+                            <thead>
+                                <tr style="background: var(--bg-hover);">
+                                    <th style="padding: 18px 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">No. MR</th>
+                                    <th style="padding: 18px 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Nama Pasien</th>
+                                    <th style="padding: 18px 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">L/P</th>
+                                    <th style="padding: 18px 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Tgl Lahir</th>
+                                    <th style="padding: 18px 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Usia</th>
+                                    <th style="padding: 18px 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Jaminan</th>
+                                    <th style="padding: 18px 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Diagnosa</th>
+                                </tr>
+                            </thead>
+                            <tbody id="patientTableBody">
+                                </tbody>
+                        </table>
+                    </div>
+
+                    <button class="fab-btn" onclick="openAddPatientModal()" style="position: fixed; bottom: 40px; right: 40px; width: 65px; height: 65px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 1.5rem; cursor: pointer; box-shadow: 0 10px 25px rgba(14, 165, 233, 0.4); display: flex; align-items: center; justify-content: center; z-index: 900; transition: 0.3s;">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="absenModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-camera-retro" style="color: var(--accent); margin-right: 8px;"></i> Absensi Ners</h3>
+                <button class="btn-close" onclick="closeAbsenModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="camera-container">
+                <video id="video-feed" autoplay playsinline></video>
+                <img id="preview-img" alt="Preview Absen">
+                <canvas id="capture-canvas" style="display: none;"></canvas>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn-action btn-capture" id="btnCapture" onclick="takeSnapshot()">
+                    <i class="fa-solid fa-camera"></i> Ambil Foto
+                </button>
+                <button class="btn-action btn-retake" id="btnRetake" onclick="resetCamera()">
+                    <i class="fa-solid fa-rotate-right"></i> Ulangi
+                </button>
+                <button class="btn-action btn-save" id="btnSaveAbsen" onclick="saveAbsen()">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Simpan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        // --- KONFIGURASI API UTAMA ---
+        // Jika sudah di hosting / folder yang sama:
+        const API_URL = 'api.php'
+
+
+        // --- 1. DARK MODE LOGIC ---
+        function toggleDarkMode(e) {
+            e.stopPropagation(); // Mencegah dropdown tertutup saat di klik
+            const htmlEl = document.documentElement;
+            const currentTheme = htmlEl.getAttribute('data-theme');
+            const icon = document.getElementById('themeIcon');
+            const text = document.getElementById('themeText');
+
+            if (currentTheme === 'light') {
+                htmlEl.setAttribute('data-theme', 'dark');
+                icon.className = "fa-solid fa-sun";
+                text.innerText = "Light Mode";
+            } else {
+                htmlEl.setAttribute('data-theme', 'light');
+                icon.className = "fa-solid fa-moon";
+                text.innerText = "Dark Mode";
+            }
+        }
+
+        // --- 2. SIDEBAR DESKTOP (COLLAPSE / SANDWICH) ---
+        function toggleSidebarDesktop() {
+            const sidebar = document.getElementById('sidebar');
+            if(window.innerWidth > 768) {
+                sidebar.classList.toggle('collapsed');
+                // Tutup submenu jika di-collapse
+                if(sidebar.classList.contains('collapsed')) {
+                    document.querySelectorAll('.submenu').forEach(sub => sub.classList.remove('open'));
+                    document.querySelectorAll('.caret').forEach(c => c.classList.remove('rotate'));
+                }
+            }
+        }
+
+        // --- 3. SIDEBAR MOBILE ---
+        function toggleSidebarMobile() {
+            if(window.innerWidth <= 768) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('mobileOverlay');
+                sidebar.classList.toggle('mobile-open');
+                overlay.classList.toggle('show');
+            }
+        }
+
+        // --- 4. DROPDOWN PROFILE ---
+        function toggleProfileDropdown(e) {
+            e.stopPropagation();
+            document.getElementById('profileDropdown').classList.toggle('show');
+        }
+        window.onclick = function(e) {
+            if (!e.target.closest('.profile-trigger') && !e.target.closest('.dropdown-menu')) {
+                document.getElementById('profileDropdown').classList.remove('show');
+            }
+        }
+
+        // --- 5. ACCORDION SUBMENU ---
+        function toggleSubmenu(subId, element) {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar.classList.contains('collapsed')) {
+                sidebar.classList.remove('collapsed'); // Buka sidebar otomatis jika sedang kecil
+            }
+
+            const sub = document.getElementById(subId);
+            const caret = element.querySelector('.caret');
+            
+            if(sub.classList.contains('open')) {
+                sub.classList.remove('open');
+                caret.classList.remove('rotate');
+            } else {
+                // Tutup yang lain
+                document.querySelectorAll('.submenu').forEach(el => el.classList.remove('open'));
+                document.querySelectorAll('.caret').forEach(el => el.classList.remove('rotate'));
+                
+                sub.classList.add('open');
+                caret.classList.add('rotate');
+            }
+        }
+
+        // --- 6. NAVIGATION (SPA LOGIC) ---
+        function navigate(pageTitle, targetViewId, element = null, isSub = false) {
+            // 1. Ubah Judul Header Atas
+            document.getElementById('pageTitleDisplay').innerText = pageTitle;
+            
+            // 2. Sembunyikan SEMUA halaman
+            const allViews = document.querySelectorAll('.page-view');
+            allViews.forEach(view => {
+                view.classList.remove('active');
+            });
+
+            // 3. Munculkan halaman yang dituju saja
+            if (targetViewId) {
+                const targetView = document.getElementById(targetViewId);
+                if (targetView) {
+                    void targetView.offsetWidth; // Force reflow untuk trigger animasi fadeIn
+                    targetView.classList.add('active');
+                }
+            }
+
+            // 4. Reset & Set Class 'active' pada menu Sidebar
+            if (element && pageTitle !== 'Profile') {
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.sub-item').forEach(el => el.classList.remove('active'));
+
+                if (isSub) {
+                    element.classList.add('active');
+                    element.closest('.submenu').previousElementSibling.classList.add('active');
+                } else {
+                    element.classList.add('active');
+                    // Tutup submenu jika klik menu utama
+                    document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
+                    document.querySelectorAll('.caret').forEach(c => c.classList.remove('rotate'));
+                }
+            }
+
+            // 5. Tutup dropdown dan mobile menu jika di HP
+            document.getElementById('profileDropdown').classList.remove('show');
+            if(window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('mobile-open');
+                document.getElementById('mobileOverlay').classList.remove('show');
+            }
+        }
+
+        // --- 7. KAMERA ABSENSI ---
+        let videoStream = null;
+        const video = document.getElementById('video-feed');
+        const canvas = document.getElementById('capture-canvas');
+        const imgPreview = document.getElementById('preview-img');
+        const btnCapture = document.getElementById('btnCapture');
+        const btnRetake = document.getElementById('btnRetake');
+        const btnSave = document.getElementById('btnSaveAbsen');
+
+        async function openAbsenModal() {
+            document.getElementById('absenModal').classList.add('active');
+            document.getElementById('profileDropdown').classList.remove('show');
+            resetCameraUI();
+
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                video.srcObject = videoStream;
+            } catch (err) {
+                alert("Gagal mengakses kamera. Izinkan akses kamera pada browser Anda.");
+            }
+        }
+
+        function closeAbsenModal() {
+            document.getElementById('absenModal').classList.remove('active');
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+            }
+        }
+
+        function takeSnapshot() {
+            // Auto Resize & Quality Control (800x600)
+            const TARGET_WIDTH = 800;
+            const TARGET_HEIGHT = 600;
+            
+            canvas.width = TARGET_WIDTH;
+            canvas.height = TARGET_HEIGHT;
+            const ctx = canvas.getContext('2d');
+            
+            // Gambar Video ke Canvas
+            ctx.drawImage(video, 0, 0, TARGET_WIDTH, TARGET_HEIGHT);
+            
+            // Gambar Overlay Timestamp (Hitam Transparan di bawah)
+            const now = new Date();
+            const timeString = now.toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' });
+            
+            ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+            ctx.fillRect(0, TARGET_HEIGHT - 60, TARGET_WIDTH, 60);
+            
+            // Tulis Teks Kiri (Waktu)
+            ctx.textAlign = "left"; // Pastikan rata kiri untuk waktu
+            ctx.fillStyle = "white";
+            ctx.font = "bold 22px 'Plus Jakarta Sans', sans-serif";
+            ctx.fillText("Hadir: " + timeString, 20, TARGET_HEIGHT - 22);
+            
+            // Tulis Teks Kanan (Nama)
+            ctx.textAlign = "right"; // Set rata kanan
+            ctx.fillStyle = "#38bdf8"; // Warna aksen
+            // Cukup gunakan angka 20 (tanpa px)
+            ctx.fillText("Ners. Admin", TARGET_WIDTH - 20, TARGET_HEIGHT - 22);
+
+            // Export ke Image URL
+            imgPreview.src = canvas.toDataURL('image/jpeg', 0.8);
+            
+            // Switch UI
+            video.style.display = 'none';
+            imgPreview.style.display = 'block';
+            btnCapture.style.display = 'none';
+            btnRetake.style.display = 'flex';
+            btnSave.style.display = 'flex';
+        }
+
+        function resetCamera() { resetCameraUI(); }
+
+        function resetCameraUI() {
+            video.style.display = 'block';
+            imgPreview.style.display = 'none';
+            btnCapture.style.display = 'flex';
+            btnRetake.style.display = 'none';
+            btnSave.style.display = 'none';
+        }
+
+        function saveAbsen() {
+            const base64Image = imgPreview.src;
+            btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+            
+            // Simulasi Proses Kirim Server
+            setTimeout(() => {
+                alert("Absen berhasil disimpan ke Database Nerstizen!");
+                closeAbsenModal();
+                btnSave.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Simpan';
+            }, 1000);
+        }
+
+        // --- 1. HITUNG USIA OTOMATIS ---
+        function calculateAge(birthDateString) {
+            if (!birthDateString || birthDateString === '1970-01-01') return "?";
+            const today = new Date();
+            const birthDate = new Date(birthDateString);
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age + " Thn";
+        }
+
+        // --- 2. LOAD DATA PASIEN DARI API ---
+        async function loadPatients() {
+            try {
+                // GUNAKAN VARIABEL API_URL DI SINI
+                const response = await fetch(`${API_URL}?action=get_patients`);
+                const patients = await response.json();
+                
+                console.log("Respon dari PHP:", patients);
+
+                const tableBody = document.getElementById('patientTableBody');
+                tableBody.innerHTML = ''; 
+                
+                // CEK ERROR DATABASE
+                if (patients.success === false || patients.error) {
+                    tableBody.innerHTML = `<tr><td colspan="7" style="padding: 20px; text-align: center; color: var(--danger); font-weight: bold;">⚠️ Gagal Mengambil Data: ${patients.message || patients.error}</td></tr>`;
+                    return;
+                }
+
+                // CEK FORMAT DATA
+                if (!Array.isArray(patients)) {
+                    tableBody.innerHTML = `<tr><td colspan="7" style="padding: 20px; text-align: center; color: var(--danger); font-weight: bold;">⚠️ Format data dari server tidak valid.</td></tr>`;
+                    return;
+                }
+
+                patients.forEach(p => {
+                    const age = calculateAge(p.tgl_lahir);
+                    
+                    // Badge Jaminan Kesehatan
+                    let badgeJamKes = `<span style="background:#e0f2fe; color:#0ea5e9; padding:4px 10px; border-radius:8px; font-size:0.8rem; font-weight:700;">${p.jam_kes || '-'}</span>`;
+                    if(p.jam_kes && p.jam_kes.toLowerCase().includes('umum')) {
+                        badgeJamKes = `<span style="background:#fce7f3; color:#db2777; padding:4px 10px; border-radius:8px; font-size:0.8rem; font-weight:700;">${p.jam_kes}</span>`;
+                    }
+
+                    // TAMPILAN BARIS TABEL 
+                    const row = `
+                        <tr class="patient-row">
+                            <td style="padding: 18px 20px; font-weight:700; color:var(--accent); border-bottom: 1px solid rgba(148, 163, 184, 0.1);">${p.no_mr}</td>
+                            <td style="padding: 18px 20px; font-weight:600; border-bottom: 1px solid rgba(148, 163, 184, 0.1);">${p.nama_pasien}</td>
+                            <td style="padding: 18px 20px; border-bottom: 1px solid rgba(148, 163, 184, 0.1);">${p.jk || '-'}</td>
+                            <td style="padding: 18px 20px; border-bottom: 1px solid rgba(148, 163, 184, 0.1);">${p.tgl_lahir_indo}</td>
+                            
+                            <td style="padding: 18px 20px; border-bottom: 1px solid rgba(148, 163, 184, 0.1);">
+                                <span style="background:var(--accent-light); color:var(--accent); padding:4px 10px; border-radius:8px; font-size:0.85rem; font-weight:800;">${age}</span>
+                            </td>
+                            
+                            <td style="padding: 18px 20px; border-bottom: 1px solid rgba(148, 163, 184, 0.1);">${badgeJamKes}</td>
+                            <td style="padding: 18px 20px; border-bottom: 1px solid rgba(148, 163, 184, 0.1);">${p.diagnosa || '-'}</td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error("Gagal memuat data pasien:", error);
+                document.getElementById('patientTableBody').innerHTML = `<tr><td colspan="7" style="padding: 20px; text-align: center; color: var(--danger); font-weight: bold;">⚠️ Terjadi kesalahan jaringan / PHP error. Cek console.</td></tr>`;
+            }
+        }
+
+        // --- 3. FITUR PENCARIAN (BISA KLIK TOMBOL ATAU TEKAN ENTER) ---
+        function filterPatientTable() {
+            const input = document.getElementById("patientSearch").value.toUpperCase();
+            const table = document.getElementById("tablePasien");
+            const tr = table.getElementsByClassName("patient-row"); 
+
+            for (let i = 0; i < tr.length; i++) {
+                let rowText = tr[i].textContent || tr[i].innerText;
+                if (rowText.toUpperCase().indexOf(input) > -1) {
+                    tr[i].style.display = ""; 
+                } else {
+                    tr[i].style.display = "none"; 
+                }
+            }
+        }
+
+        // Tambahkan Listener untuk mendeteksi tombol "Enter" di keyboard
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPatients(); // Panggil data saat awal
+
+            // Fungsi Enter pada Input Pencarian
+            const searchInput = document.getElementById("patientSearch");
+            if(searchInput) {
+                searchInput.addEventListener("keypress", function(event) {
+                    if (event.key === "Enter") {
+                        event.preventDefault(); // Mencegah reload form bawaan browser
+                        filterPatientTable();   // Jalankan pencarian
+                    }
+                });
+            }
+        });
+
+        // --- 4. MODAL TAMBAH PASIEN ---
+        function openAddPatientModal() { document.getElementById('addPatientModal').classList.add('active'); }
+        function closeAddPatientModal() { document.getElementById('addPatientModal').classList.remove('active'); }
+
+        async function submitNewPatient() {
+            const data = {
+                mr: document.getElementById('newMR').value,
+                nama: document.getElementById('newNama').value,
+                tgl_lahir: document.getElementById('newTglLahir').value,
+                dx: document.getElementById('newDx').value
+            };
+
+            // GUNAKAN VARIABEL API_URL DI SINI JUGA
+            const response = await fetch(`${API_URL}?action=add_patient`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            
+            const res = await response.json();
+            if(res.success) {
+                alert("Pasien Berhasil Ditambahkan!");
+                closeAddPatientModal();
+                loadPatients(); // Refresh tabel otomatis
+            } else {
+                alert("Gagal: " + res.message);
+            }
+        }
+    </script>
+</body>
+</html>
